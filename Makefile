@@ -1,4 +1,4 @@
-SOURCES = main.erl
+SOURCES = main.erl utils.erl
 BEAMS = $(SOURCES:.erl=.beam)
 
 .SUFFIXES: .erl .beam

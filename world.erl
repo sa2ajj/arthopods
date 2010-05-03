@@ -23,12 +23,12 @@ world_loop(Parent, Size) ->
             exit(normal);
 
         { food } ->
-            io:format(" food!~n"),
-            world_loop(Parent, Size);
+            io:format(" food!~n");
 
         Other ->
-            io:format("World got: ~p~n", [ Other ]),
-            world_loop(Parent, Size)
-    end.
+            io:format("World got: ~p~n", [ Other ])
+    end,
+
+    world_loop(Parent, Size).
 
 % vim:ts=4:sw=4:et

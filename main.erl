@@ -6,6 +6,7 @@
 
 start() ->
     io:format("great stuff will be here :)~n"),
+    world:start(),
     loop().
 
 loop() -> loop().

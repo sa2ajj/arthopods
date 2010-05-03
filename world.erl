@@ -25,6 +25,10 @@ world_loop(Parent, Size) ->
         { food } ->
             io:format(" food!~n");
 
+        { size, Pid } ->
+            io:format(" size requested from ~p~n", [ Pid ]),
+            Pid ! { size, Size };
+
         Other ->
             io:format("World got: ~p~n", [ Other ])
     end,

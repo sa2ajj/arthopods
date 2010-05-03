@@ -9,7 +9,7 @@ BEAMS = $(SOURCES:.erl=.beam)
 all: $(BEAMS)
 
 run: all
-	erl -run main
+	erl -noshell -s main -s init stop
 
 clean:
 	rm -f $(BEAMS)

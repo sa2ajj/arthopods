@@ -12,6 +12,7 @@ world_loop0(Parent, Size) ->
     process_flag(trap_exit, true),          % follow exits of interesting processes
     link(Parent),
     Parent ! { world, self() },
+    io:format("We are as big as ~p~n", [Size]),
     world_loop(Parent, Size).
 
 world_loop(Parent, Size) ->
@@ -19,11 +20,14 @@ world_loop(Parent, Size) ->
 
     receive
         { 'EXIT', Parent, _Reason } ->
-            io:format("~nWorld: exiting...~n"),
+            io:format(" exiting...~n"),
             exit(normal);
 
+        { welcome, _ } ->
+            io:format(" welcomed.~n");
+
         { food, Location } ->
-            io:format(" food (~p)!~n", Location);
+            io:format(" food (~p)!~n", [Location]);
 
         { size, Pid } ->
             io:format(" size requested from ~p~n", [ Pid ]),

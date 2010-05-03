@@ -7,7 +7,14 @@
 start() ->
     io:format("great stuff will be here :)~n"),
     world:start(),
-    loop().
+    receive
+        { world, World } ->
+            io:format("World has been created!~n"),
+            World ! { welcome, "Thank you for being there" },
+            loop()
+            ;
+        Other -> io:format("Got: ~w~n", Other)
+    end.
 
 loop() -> loop().
 

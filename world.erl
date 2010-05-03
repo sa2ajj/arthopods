@@ -9,14 +9,21 @@ start() ->
 
 world_loop0(Parent) ->
     io:format("The world is about to revolve.~n"),
-    process_flag(trap_exit, true),
+    process_flag(trap_exit, true),          % follow exits of interesting processes
     link(Parent),
+    Parent ! { world, self() },
     world_loop(Parent).
 
 world_loop(Parent) ->
+    io:format("World: waiting... "),
+
     receive
-        { 'EXIT', Parent, _Reason } -> exit(normal);
-        Other -> io:format("World got: ~w~n", Other), world_loop(Parent)
+        { 'EXIT', Parent, _Reason } ->
+            exit(normal);
+
+        Other ->
+            io:format("World got: ~w~n", Other),
+            world_loop(Parent)
     end.
 
 % vim:ts=4:sw=4:et

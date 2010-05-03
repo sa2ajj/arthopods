@@ -22,7 +22,7 @@ world_loop(Parent) ->
             exit(normal);
 
         Other ->
-            io:format("World got: ~w~n", Other),
+            io:format("World got: ~p~n", [ Other ]),
             world_loop(Parent)
     end.
 

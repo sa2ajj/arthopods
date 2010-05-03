@@ -22,8 +22,8 @@ world_loop(Parent, Size) ->
             io:format("~nWorld: exiting...~n"),
             exit(normal);
 
-        { food } ->
-            io:format(" food!~n");
+        { food, Location } ->
+            io:format(" food (~p)!~n", Location);
 
         { size, Pid } ->
             io:format(" size requested from ~p~n", [ Pid ]),

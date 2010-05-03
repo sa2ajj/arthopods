@@ -2,19 +2,19 @@
 
 -module(world).
 
--export([start/0, world_loop0/1]).
+-export([start/1, world_loop0/2]).
 
-start() ->
-    spawn(?MODULE, world_loop0, [ self() ]).
+start(Size) ->
+    spawn(?MODULE, world_loop0, [ self(), Size ]).
 
-world_loop0(Parent) ->
+world_loop0(Parent, Size) ->
     io:format("The world is about to revolve.~n"),
     process_flag(trap_exit, true),          % follow exits of interesting processes
     link(Parent),
     Parent ! { world, self() },
-    world_loop(Parent).
+    world_loop(Parent, Size).
 
-world_loop(Parent) ->
+world_loop(Parent, Size) ->
     io:format("World: waiting... "),
 
     receive
@@ -24,11 +24,11 @@ world_loop(Parent) ->
 
         { food } ->
             io:format(" food!~n"),
-            world_loop(Parent);
+            world_loop(Parent, Size);
 
         Other ->
             io:format("World got: ~p~n", [ Other ]),
-            world_loop(Parent)
+            world_loop(Parent, Size)
     end.
 
 % vim:ts=4:sw=4:et

@@ -12,11 +12,9 @@ food_loop0(World, Ticks) ->
     food_loop(World, Ticks).
 
 food_loop(World, Ticks) ->
-    receive
-    after
-        Ticks ->
-            World ! { food },
-            food_loop(World, Ticks)
+    receive after Ticks ->
+        World ! { food },
+        food_loop(World, Ticks)
     end.
 
 % vim:ts=4:sw=4:et

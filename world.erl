@@ -22,6 +22,10 @@ world_loop(Parent) ->
             io:format("~nWorld: exiting...~n"),
             exit(normal);
 
+        { food } ->
+            io:format(" food!~n"),
+            world_loop(Parent);
+
         Other ->
             io:format("World got: ~p~n", [ Other ]),
             world_loop(Parent)

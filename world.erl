@@ -19,6 +19,7 @@ world_loop(Parent) ->
 
     receive
         { 'EXIT', Parent, _Reason } ->
+            io:format("~nWorld: exiting...~n"),
             exit(normal);
 
         Other ->

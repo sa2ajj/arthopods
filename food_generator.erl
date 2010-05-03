@@ -11,14 +11,20 @@ food_loop0(World, Ticks) ->
     io:format("Food is unlimited!~n"),
     World ! { size, self() },
     receive
-        { size, Size } -> food_loop(World, Ticks, Size);
+        { size, Size } ->
+            io:format("World size is ~p~n", [Size]),
+            food_loop(World, Ticks, Size);
 
-        Other -> io:format("Food generator got: ~p~nFood generator cannot continue.~n", [ Other ])
+        Other ->
+            io:format("Food generator got: ~p~nFood generator cannot continue.~n", [ Other ])
     end.
 
 food_loop(World, Ticks, Size) ->
+    io:format("Food for world of size ~p~n", [Size]),
     receive after Ticks ->
-        World ! { food, get_food(Size) },
+        Location = get_food(Size),
+        io:format("Food @ ~p~n", [ { food, Location } ]),
+        World ! { food, Location },
         food_loop(World, Ticks, Size)
     end.
 

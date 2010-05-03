@@ -20,10 +20,10 @@ food_loop0(World, Ticks) ->
     end.
 
 food_loop(World, Ticks, Size) ->
-    io:format("Food for world of size ~p~n", [Size]),
+    % io:format("Food for world of size ~p~n", [Size]),
     receive after Ticks ->
         Location = get_food(Size),
-        io:format("Food @ ~p~n", [ { food, Location } ]),
+        % io:format("Food @ ~p~n", [ { food, Location } ]),
         World ! { food, Location },
         food_loop(World, Ticks, Size)
     end.

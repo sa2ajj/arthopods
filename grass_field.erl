@@ -69,11 +69,42 @@ make_patch({X0, Y0}, {X1, Y1}) ->
       { empty, {Xc, Yc}, {X1, Y1} },
       { empty, {X0, Yc}, {Xc, Y1} }}.
 
-cut(GrassField, _Location) ->
-    { GrassField, not_done }.
+%% remove an item from the grass field
+
+cut({empty, _Corner0, _Corner1} = Empty, _Location) ->
+    {Empty, not_available};
+
+cut({leaf, _Leaf, Corner0, Corner1}, _Leaf) ->
+    {{empty, Corner0, Corner1}, ok};
+
+cut({leaf, _Leaf, _Corner0, _Corner1} = Current, _Location) ->
+    {Current, not_available};
+
+cut({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Location) ->
+    case {X < Xc, Y < Yc} of
+        { true, true } ->
+            {NewPatch, Result} = cut(Patch1, Location),
+            {{patch, Center, NewPatch, Patch2, Patch3, Patch4}, Result};
+
+        { false, true } ->
+            {NewPatch, Result} = cut(Patch2, Location),
+            {{patch, Center, Patch1, NewPatch, Patch3, Patch4}, Result};
+
+        { false, false } ->
+            {NewPatch, Result} = cut(Patch3, Location),
+            {{patch, Center, Patch1, Patch2, NewPatch, Patch4}, Result};
+
+        { true, false } ->
+            {NewPatch, Result} = cut(Patch4, Location),
+            {{patch, Center, Patch1, Patch2, Patch3, NewPatch}, Result}
+    end.
+
+%% finding all leaves in the given rectangle
 
 find(GrassField, {_Corner0, _Corner1}) ->
     { GrassField, 0 }.
+
+%% debug dump
 
 indent(0) -> ok;
 

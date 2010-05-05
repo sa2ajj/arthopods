@@ -27,7 +27,7 @@ grow2({empty, Corner0, Corner1}, Location) ->
 grow2({leaf, Leaf, _, _} = GrassField, Leaf) ->
     GrassField;
 
-grow2({leaf, Leaf, {X0, Y0} = Corner0, {X1, Y1} = Corner1}, Location) ->
+grow2({leaf, Leaf, {X0, Y0}, {X1, Y1}}, Location) ->
     Xc = (X0 + X1) / 2,
     Yc = (Y0 + Y1) / 2,
 

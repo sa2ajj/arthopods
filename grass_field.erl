@@ -24,7 +24,7 @@ grow(GrassField, Location) ->
 grow2({empty, Corner0, Corner1}, Location) ->
     { leaf, Location, Corner0, Corner1 };
 
-grow2({leaf, Leaf, {X0, Y0} = Corner0, {X1, Y1} = Corner1} = GrassField, Leaf) ->
+grow2({leaf, Leaf, _, _} = GrassField, Leaf) ->
     GrassField;
 
 grow2({leaf, Leaf, {X0, Y0} = Corner0, {X1, Y1} = Corner1}, Location) ->

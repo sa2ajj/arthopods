@@ -16,7 +16,7 @@ index(Item, [ Item | _Tail ], Index) -> Index;
 index(Item, [ _Head | Tail ], Index) -> index(Item, Tail, Index+1).
 
 round_to_power_of_2(Number)
-    when is_number(Number) andalso Number >= 0 ->
+    when is_integer(Number) andalso Number >= 0 ->
 
     round_to_power_of_2_2(Number, 1).
 

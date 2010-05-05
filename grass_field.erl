@@ -2,14 +2,32 @@
 
 -module(grass_field).
 
--export([new/1, grow/2]).
+-export([start/1]).
 
 -import(utils, [round_to_power_of_2/1]).
 
-new({Width, Height}) ->
+start({Width, Height}) ->
     MaxValue = round_to_power_of_2(lists:max([Width, Height]))-1,
 
-    { empty, {0, 0}, {MaxValue, MaxValue} }.
+    loop({ empty, {0, 0}, {MaxValue, MaxValue} }).
+
+loop(GrassField) ->
+    receive
+        {grow, Pid, Location} ->
+            NewField = grow(GrassField, Location),
+            Pid ! ack_grow,
+            loop(NewField);
+
+        {cut, Pid, Location} ->
+            {NewField, Result} = cut(GrassField, Location),
+            Pid ! {ack_cut, Result},
+            loop(NewField);
+
+        {find, Pid, Bounds} ->
+            {NewField, Amount} = find(GrassField, Bounds),
+            Pid ! {ack_find, Amount},
+            loop(NewField)
+    end.
 
 grow({empty, Corner0, Corner1}, Location) ->
     { leaf, Location, Corner0, Corner1 };
@@ -44,5 +62,11 @@ grow({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Locati
         { true, false } ->
             { patch, Center, Patch1, Patch2, Patch3, grow(Patch4, Location) }
     end.
+
+cut(GrassField, _Location) ->
+    { GrassField, false }.
+
+find(GrassField, {_Corner0, _Corner1}) ->
+    { GrassField, 0 }.
 
 % vim:ts=4:sw=4:et

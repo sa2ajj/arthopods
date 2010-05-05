@@ -15,10 +15,7 @@ new({Width, Height})
 
     MaxValue = round_to_power_of_2(lists:max([Width, Height]))-1,
 
-    make_empty({0, 0}, {MaxValue, MaxValue}).
-
-make_empty(Corner0, Corner1) ->
-    {empty, Corner0, Corner1}.
+    { empty, {0, 0}, {MaxValue, MaxValue} }.
 
 % grow(GrassField, {X, Y} = Location)
     % TODO: add some validation for X & Y?
@@ -36,10 +33,10 @@ grow2({leaf, Leaf, {X0, Y0} = Corner0, {X1, Y1} = Corner1}, Location) ->
     grow2(grow2({
         patch,
         {Xc, Yc},
-        make_empty({X0, Xc}, {Y0, Yc}),
-        make_empty({Xc, X1}, {Y0, Yc}),
-        make_empty({Xc, X1}, {Yc, Y1}),
-        make_empty({X0, Xc}, {Yc, Y1})
+        { empty, {X0, Xc}, {Y0, Yc} },
+        { empty, {Xc, X1}, {Y0, Yc} },
+        { empty, {Xc, X1}, {Yc, Y1} },
+        { empty, {X0, Xc}, {Yc, Y1} }
     }, Leaf), Location);
 
 grow2({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Location) ->

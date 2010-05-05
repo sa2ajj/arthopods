@@ -12,4 +12,4 @@ run: all
 	erl -noshell -s main -s init stop
 
 clean:
-	rm -f $(BEAMS)
+	rm -f $(BEAMS) erl_crash.dump

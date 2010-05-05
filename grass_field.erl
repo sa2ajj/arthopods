@@ -102,8 +102,29 @@ cut({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Locatio
 %% finding all leaves in the given rectangle
 %% find(GrassField, Boundaries) --> {NewField, NumberOfFoundLeaves}
 
-find(GrassField, {_Corner0, _Corner1}) ->
-    { GrassField, 0 }.
+find({empty, _Corner0, _Corner1} = Empty, _Boundaries) ->
+    { Empty, 0 };
+
+find({leaf, {Xl, Yl}, Corner0, Corner1} = Field, {{X0, Y0}, {X1, Y1}}) ->
+    if
+        (X0 =< Xl) and (Xl =< X1) and (Y0 =< Yl) and (Yl =< Y1) ->
+            { {empty, Corner0, Corner1}, 1 };
+        true ->
+            { Field, 0 }
+    end;
+
+find({patch, _Center, {empty, {X0, Y0}}, {empty, {_X1, _Y1}}, {empty, {_X2, _Y2}}, {empty, {X3, Y3}}}, _Boundaries) ->
+    { {empty, {X0, Y0}, {X3, Y3}}, 0 };
+
+find({patch, Center, Patch1, Patch2, Patch3, Patch4}, Boundaries) ->
+    {NewPatch1, Count1} = find(Patch1, Boundaries),
+    {NewPatch2, Count2} = find(Patch2, Boundaries),
+    {NewPatch3, Count3} = find(Patch3, Boundaries),
+    {NewPatch4, Count4} = find(Patch4, Boundaries),
+    {{patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4}, Count1+Count2+Count3+Count4};
+
+find(_Field, _Boundaries) ->
+    error.
 
 %% debug dump
 

@@ -82,6 +82,7 @@ indent(N) ->
     indent(N-1).
 
 dump(GrassField) ->
+    io:format("~n"),
     dump(GrassField, 0).
 
 dump({empty, {X0, Y0}, {X1, Y1}}, Level) ->

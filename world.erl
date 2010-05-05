@@ -29,14 +29,14 @@ world_loop(Parent, Size, Field) ->
 
         { food, Location } ->
             io:format(" food (~p)!~n", [Location]),
-            Field ! { grow, Location };
+            Field ! { grow, self(), Location };
 
         { size, Pid } ->
             io:format(" size requested from ~p~n", [ Pid ]),
             Pid ! { size, Size };
 
         ack_grow ->
-            Field ! dump;
+            Field ! { dump, self() };
 
         ack_dump ->
             ok;

@@ -36,26 +36,25 @@ grow2({leaf, Leaf, {X0, Y0} = Corner0, {X1, Y1} = Corner1}, Location) ->
     grow2(grow2({
         patch,
         {Xc, Yc},
-        Corner0, Corner1,
         make_empty({X0, Xc}, {Y0, Yc}),
         make_empty({Xc, X1}, {Y0, Yc}),
         make_empty({Xc, X1}, {Yc, Y1}),
         make_empty({X0, Xc}, {Yc, Y1})
     }, Leaf), Location);
 
-grow2({patch, {Xc, Yc} = Center, Corner0, Corner1, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Location) ->
+grow2({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Location) ->
     case {X < Xc, Y < Yc} of
         { true, true } ->
-            { patch, Center, Corner0, Corner1, grow2(Patch1, Location), Patch2, Patch3, Patch4 };
+            { patch, Center, grow2(Patch1, Location), Patch2, Patch3, Patch4 };
 
         { false, true } ->
-            { patch, Center, Corner0, Corner1, Patch1, grow2(Patch2, Location), Patch3, Patch4 };
+            { patch, Center, Patch1, grow2(Patch2, Location), Patch3, Patch4 };
 
         { false, false } ->
-            { patch, Center, Corner0, Corner1, Patch1, Patch2, grow2(Patch3, Location), Patch4 };
+            { patch, Center, Patch1, Patch2, grow2(Patch3, Location), Patch4 };
 
         { true, false } ->
-            { patch, Center, Corner0, Corner1, Patch1, Patch2, Patch3, grow2(Patch4, Location) }
+            { patch, Center, Patch1, Patch2, Patch3, grow2(Patch4, Location) }
     end.
 
 % vim:ts=4:sw=4:et

@@ -35,18 +35,9 @@ grow({empty, Corner0, Corner1}, Location) ->
 grow({leaf, Leaf, _, _} = GrassField, Leaf) ->
     GrassField;
 
-grow({leaf, Leaf, {X0, Y0}, {X1, Y1}}, Location) ->
-    Xc = (X0 + X1) / 2,
-    Yc = (Y0 + Y1) / 2,
-
-    grow(grow({
-        patch,
-        {Xc, Yc},
-        { empty, {X0, Xc}, {Y0, Yc} },
-        { empty, {Xc, X1}, {Y0, Yc} },
-        { empty, {Xc, X1}, {Yc, Y1} },
-        { empty, {X0, Xc}, {Yc, Y1} }
-    }, Leaf), Location);
+grow({leaf, Leaf, Corner0, Corner1}, Location) ->
+    Field = make_patch(Corner0, Corner1),
+    grow(grow(Field, Leaf), Location);
 
 grow({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Location) ->
     case {X < Xc, Y < Yc} of
@@ -62,6 +53,19 @@ grow({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Locati
         { true, false } ->
             { patch, Center, Patch1, Patch2, Patch3, grow(Patch4, Location) }
     end.
+
+make_patch({X0, Y0}, {X1, Y1}) ->
+    Xc = (X0 + X1) / 2,
+    Yc = (Y0 + Y1) / 2,
+
+    {
+        patch,
+        {Xc, Yc},
+        { empty, {X0, Xc}, {Y0, Yc} },
+        { empty, {Xc, X1}, {Y0, Yc} },
+        { empty, {Xc, X1}, {Yc, Y1} },
+        { empty, {X0, Xc}, {Yc, Y1} }
+    }.
 
 cut(GrassField, _Location) ->
     { GrassField, false }.

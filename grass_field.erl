@@ -26,7 +26,12 @@ loop(GrassField) ->
         {find, Pid, Bounds} ->
             {NewField, Amount} = find(GrassField, Bounds),
             Pid ! {ack_find, Amount},
-            loop(NewField)
+            loop(NewField);
+
+        {dump, Pid} ->
+            dump(GrassField),
+            Pid ! ack_dump,
+            loop(GrassField)
     end.
 
 grow({empty, Corner0, Corner1}, Location) ->
@@ -69,5 +74,31 @@ cut(GrassField, _Location) ->
 
 find(GrassField, {_Corner0, _Corner1}) ->
     { GrassField, 0 }.
+
+indent(0) -> ok;
+
+indent(N) ->
+    io:format(" ", []),
+    indent(N-1).
+
+dump(GrassField) ->
+    dump(GrassField, 0).
+
+dump({empty, {X0, Y0}, {X1, Y1}}, Level) ->
+    indent(Level),
+    io:format("empty (~p, ~p) - (~p, ~p)~n", [ X0, Y0, X1, Y1 ]);
+
+dump({leaf, {Xl, Yl}, {X0, Y0}, {X1, Y1}}, Level) ->
+    indent(Level),
+    io:format("leaf @ (~p, ~p) for (~p, ~p) - (~p, ~p)~n", [ Xl, Yl, X0, Y0, X1, Y1 ]);
+
+dump({patch, {Xc, Yc}, Patch1, Patch2, Patch3, Patch4}, Level) ->
+    indent(Level),
+    io:format("patches with center @ (~p, ~p)~n", [ Xc, Yc ]),
+    Level1 = Level + 1,
+    dump(Patch1, Level1),
+    dump(Patch2, Level1),
+    dump(Patch3, Level1),
+    dump(Patch4, Level1).
 
 % vim:ts=4:sw=4:et

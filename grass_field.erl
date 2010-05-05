@@ -33,16 +33,14 @@ grow2({leaf, Leaf, {X0, Y0} = Corner0, {X1, Y1} = Corner1}, Location) ->
     Xc = (X0 + X1) / 2,
     Yc = (Y0 + Y1) / 2,
 
-    Xc1 = Xc-1, Yc1 = Yc-1,
-
     grow2(grow2({
         patch,
         {Xc, Yc},
         Corner0, Corner1,
-        make_empty({X0, Xc1}, {Y0, Yc1}),
-        make_empty({Xc, X1}, {Y0, Yc1}),
+        make_empty({X0, Xc}, {Y0, Yc}),
+        make_empty({Xc, X1}, {Y0, Yc}),
         make_empty({Xc, X1}, {Yc, Y1}),
-        make_empty({X0, Xc1}, {Yc, Y1})
+        make_empty({X0, Xc}, {Yc, Y1})
     }, Leaf), Location);
 
 grow2({patch, {Xc, Yc} = Center, Corner0, Corner1, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Location) ->

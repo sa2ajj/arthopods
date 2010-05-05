@@ -58,14 +58,11 @@ make_patch({X0, Y0}, {X1, Y1}) ->
     Xc = (X0 + X1) / 2,
     Yc = (Y0 + Y1) / 2,
 
-    {
-        patch,
-        {Xc, Yc},
-        { empty, {X0, Xc}, {Y0, Yc} },
-        { empty, {Xc, X1}, {Y0, Yc} },
-        { empty, {Xc, X1}, {Yc, Y1} },
-        { empty, {X0, Xc}, {Yc, Y1} }
-    }.
+    { patch, {Xc, Yc},
+      { empty, {X0, Xc}, {Y0, Yc} },
+      { empty, {Xc, X1}, {Y0, Yc} },
+      { empty, {Xc, X1}, {Yc, Y1} },
+      { empty, {X0, Xc}, {Yc, Y1} }}.
 
 cut(GrassField, _Location) ->
     { GrassField, not_done }.

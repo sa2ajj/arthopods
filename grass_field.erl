@@ -113,8 +113,8 @@ find({leaf, {Xl, Yl}, Corner0, Corner1} = Field, {{X0, Y0}, {X1, Y1}}) ->
             { Field, 0 }
     end;
 
-find({patch, _Center, {empty, {X0, Y0}}, {empty, {_X1, _Y1}}, {empty, {_X2, _Y2}}, {empty, {X3, Y3}}}, _Boundaries) ->
-    { {empty, {X0, Y0}, {X3, Y3}}, 0 };
+find({patch, _Center, {empty, {X0, Y0}}, {empty, {_X1, _Y1}}, {empty, {X2, Y2}}, {empty, {_X3, _Y3}}}, _Boundaries) ->
+    { {empty, {X0, Y0}, {X2, Y2}}, 0 };
 
 find({patch, Center, Patch1, Patch2, Patch3, Patch4}, Boundaries) ->
     {NewPatch1, Count1} = find(Patch1, Boundaries),

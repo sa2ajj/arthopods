@@ -32,7 +32,7 @@ loop(GrassField) ->
 grow({empty, Corner0, Corner1}, Location) ->
     { leaf, Location, Corner0, Corner1 };
 
-grow({leaf, Leaf, _, _} = GrassField, Leaf) ->
+grow({leaf, _Leaf, _, _} = GrassField, _Leaf) ->
     GrassField;
 
 grow({leaf, Leaf, Corner0, Corner1}, Location) ->

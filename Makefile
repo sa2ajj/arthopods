@@ -1,4 +1,4 @@
-SOURCES = main.erl world.erl food_generator.erl utils.erl
+SOURCES = main.erl world.erl food_generator.erl utils.erl grass_field.erl
 BEAMS = $(SOURCES:.erl=.beam)
 
 .SUFFIXES: .erl .beam

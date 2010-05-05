@@ -36,6 +36,9 @@ world_loop(Parent, Size, Field) ->
             Pid ! { size, Size };
 
         ack_grow ->
+            Field ! dump;
+
+        ack_dump ->
             ok;
 
         Other ->

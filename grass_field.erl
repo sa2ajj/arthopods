@@ -8,10 +8,8 @@
 
 new({Width, Height})
     when
-        is_integer(Width) andalso
-        is_integer(Height) andalso
-        Width > 0 andalso
-        Height > 0 ->
+        is_integer(Width), Width > 0,
+        is_integer(Height), Height > 0 ->
 
     MaxValue = round_to_power_of_2(lists:max([Width, Height]))-1,
 

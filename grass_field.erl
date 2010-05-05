@@ -7,7 +7,7 @@
 -import(utils, [round_to_power_of_2/1]).
 
 start(MaxEdge) ->
-    MaxValue = round_to_power_of_2(MaxEdge)-1,
+    MaxValue = round_to_power_of_2(MaxEdge),
 
     loop({ empty, {0, 0}, {MaxValue, MaxValue} }).
 
@@ -60,8 +60,8 @@ grow({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Locati
     end.
 
 make_patch({X0, Y0}, {X1, Y1}) ->
-    Xc = (X0 + X1 + 1) div 2,
-    Yc = (Y0 + Y1 + 1) div 2,
+    Xc = (X0 + X1) div 2,
+    Yc = (Y0 + Y1) div 2,
 
     { patch, {Xc, Yc},
       { empty, {X0, Y0}, {Xc, Yc} },

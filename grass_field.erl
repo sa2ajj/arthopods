@@ -68,7 +68,7 @@ make_patch({X0, Y0}, {X1, Y1}) ->
     }.
 
 cut(GrassField, _Location) ->
-    { GrassField, false }.
+    { GrassField, not_done }.
 
 find(GrassField, {_Corner0, _Corner1}) ->
     { GrassField, 0 }.

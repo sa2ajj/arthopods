@@ -121,10 +121,7 @@ find({patch, Center, Patch1, Patch2, Patch3, Patch4}, Boundaries) ->
     {NewPatch2, Count2} = find(Patch2, Boundaries),
     {NewPatch3, Count3} = find(Patch3, Boundaries),
     {NewPatch4, Count4} = find(Patch4, Boundaries),
-    {{patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4}, Count1+Count2+Count3+Count4};
-
-find(_Field, _Boundaries) ->
-    error.
+    {{patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4}, Count1+Count2+Count3+Count4}.
 
 %% debug dump
 

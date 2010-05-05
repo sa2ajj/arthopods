@@ -15,23 +15,17 @@ new({Width, Height})
 
     { empty, {0, 0}, {MaxValue, MaxValue} }.
 
-% grow(GrassField, {X, Y} = Location)
-    % TODO: add some validation for X & Y?
-
-grow(GrassField, Location) ->
-    grow2(GrassField, Location).
-
-grow2({empty, Corner0, Corner1}, Location) ->
+grow({empty, Corner0, Corner1}, Location) ->
     { leaf, Location, Corner0, Corner1 };
 
-grow2({leaf, Leaf, _, _} = GrassField, Leaf) ->
+grow({leaf, Leaf, _, _} = GrassField, Leaf) ->
     GrassField;
 
-grow2({leaf, Leaf, {X0, Y0}, {X1, Y1}}, Location) ->
+grow({leaf, Leaf, {X0, Y0}, {X1, Y1}}, Location) ->
     Xc = (X0 + X1) / 2,
     Yc = (Y0 + Y1) / 2,
 
-    grow2(grow2({
+    grow(grow({
         patch,
         {Xc, Yc},
         { empty, {X0, Xc}, {Y0, Yc} },
@@ -40,19 +34,19 @@ grow2({leaf, Leaf, {X0, Y0}, {X1, Y1}}, Location) ->
         { empty, {X0, Xc}, {Yc, Y1} }
     }, Leaf), Location);
 
-grow2({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Location) ->
+grow({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Location) ->
     case {X < Xc, Y < Yc} of
         { true, true } ->
-            { patch, Center, grow2(Patch1, Location), Patch2, Patch3, Patch4 };
+            { patch, Center, grow(Patch1, Location), Patch2, Patch3, Patch4 };
 
         { false, true } ->
-            { patch, Center, Patch1, grow2(Patch2, Location), Patch3, Patch4 };
+            { patch, Center, Patch1, grow(Patch2, Location), Patch3, Patch4 };
 
         { false, false } ->
-            { patch, Center, Patch1, Patch2, grow2(Patch3, Location), Patch4 };
+            { patch, Center, Patch1, Patch2, grow(Patch3, Location), Patch4 };
 
         { true, false } ->
-            { patch, Center, Patch1, Patch2, Patch3, grow2(Patch4, Location) }
+            { patch, Center, Patch1, Patch2, Patch3, grow(Patch4, Location) }
     end.
 
 % vim:ts=4:sw=4:et

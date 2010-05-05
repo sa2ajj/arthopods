@@ -100,6 +100,7 @@ cut({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Locatio
     end.
 
 %% finding all leaves in the given rectangle
+%% find(GrassField, Boundaries) --> {NewField, NumberOfFoundLeaves}
 
 find(GrassField, {_Corner0, _Corner1}) ->
     { GrassField, 0 }.

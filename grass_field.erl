@@ -6,8 +6,8 @@
 
 -import(utils, [round_to_power_of_2/1]).
 
-start({Width, Height}) ->
-    MaxValue = round_to_power_of_2(lists:max([Width, Height]))-1,
+start(MaxEdge) ->
+    MaxValue = round_to_power_of_2(MaxEdge)-1,
 
     loop({ empty, {0, 0}, {MaxValue, MaxValue} }).
 

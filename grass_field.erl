@@ -6,11 +6,7 @@
 
 -import(utils, [round_to_power_of_2/1]).
 
-new({Width, Height})
-    when
-        is_integer(Width), Width > 0,
-        is_integer(Height), Height > 0 ->
-
+new({Width, Height}) ->
     MaxValue = round_to_power_of_2(lists:max([Width, Height]))-1,
 
     { empty, {0, 0}, {MaxValue, MaxValue} }.

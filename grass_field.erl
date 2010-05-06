@@ -59,12 +59,12 @@ grow({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Locati
             { patch, Center, Patch1, Patch2, Patch3, grow(Patch4, Location) }
     end.
 
-% +----+----+ Y1
-% | P4 | P3 |
-% +----+----+ Yc
-% | P1 | P2 |
-% +----+----+ Y0
-% X0   Xc   X1
+% Y1 +----+----+
+%    | P4 | P3 |
+% Yc +----+----+
+%    | P1 | P2 |
+% Y0 +----+----+
+%    X0   Xc   X1
 
 make_patch({X0, Y0}, {X1, Y1}) ->
     Xc = (X0 + X1) div 2,

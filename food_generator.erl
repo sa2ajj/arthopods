@@ -28,8 +28,7 @@ food_loop(World, Ticks, Size) ->
         food_loop(World, Ticks, Size)
     end.
 
-get_food({ Width, Height })
-    when is_integer(Width) andalso is_integer(Height) ->
+get_food({ Width, Height }) ->
     { random:uniform(Width), random:uniform(Height) }.
 
 % vim:ts=4:sw=4:et

@@ -162,8 +162,8 @@ find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {{Xl, Yb}, {Xr,
             {NewPatch3, Count3} = find(Patch3, Boundaries),
             {NewPatch4, Count4} = find(Patch4, Boundaries),
             {{patch, Center, Patch1, Patch2, NewPatch3, NewPatch4}, Count3+Count4};
-        % two bottom quadrants
-        { _, _, _, true } ->
+        % two left quadrants
+        { _, _, true, _ } ->
             {NewPatch4, Count4} = find(Patch4, Boundaries),
             {NewPatch1, Count1} = find(Patch1, Boundaries),
             {{patch, Center, NewPatch1, Patch2, Patch3, NewPatch4}, Count4+Count1};

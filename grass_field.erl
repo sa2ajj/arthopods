@@ -116,12 +116,31 @@ find({leaf, {Xl, Yl}, Corner0, Corner1} = Field, {{X0, Y0}, {X1, Y1}}) ->
 find({patch, _Center, {empty, {X0, Y0}}, {empty, {_X1, _Y1}}, {empty, {X2, Y2}}, {empty, {_X3, _Y3}}}, _Boundaries) ->
     { {empty, {X0, Y0}, {X2, Y2}}, 0 };
 
-find({patch, Center, Patch1, Patch2, Patch3, Patch4}, Boundaries) ->
-    {NewPatch1, Count1} = find(Patch1, Boundaries),
-    {NewPatch2, Count2} = find(Patch2, Boundaries),
-    {NewPatch3, Count3} = find(Patch3, Boundaries),
-    {NewPatch4, Count4} = find(Patch4, Boundaries),
-    {{patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4}, Count1+Count2+Count3+Count4}.
+find({patch, {Xc, Yc}, Patch1, Patch2, Patch3, Patch4}, {{Xl, Yl}, {Xr, Yr}} = Boundaries ) ->
+    if
+        (Xr < Xc) and (Yr < Yc) ->
+            {NewPatch1, Count1} = find(Patch1, Boundaries),
+            {{patch, Center, NewPatch1, Patch2, Patch3, Patch4}, Count1};
+
+        (Xc >= Xl) and (Yr < Yc) ->
+            {NewPatch2, Count2} = find(Patch2, Boundaries),
+            {{patch, Center, Patch1, NewPatch2, Patch3, Patch4}, Count2}
+
+        (Xc >= Xl) and (Yc >= Yl) ->
+            {NewPatch3, Count3} = find(Patch3, Boundaries),
+            {{patch, Center, Patch1, Patch2, NewPatch3, Patch4}, Count3};
+
+        (Xr < Xc) and (Yc >= Yl) ->
+            {NewPatch4, Count4} = find(Patch4, Boundaries),
+            {{patch, Center, Patch1, Patch2, Patch3, NewPatch4}, Count4};
+
+        true ->
+            {NewPatch1, Count1} = find(Patch1, Boundaries),
+            {NewPatch2, Count2} = find(Patch2, Boundaries),
+            {NewPatch3, Count3} = find(Patch3, Boundaries),
+            {NewPatch4, Count4} = find(Patch4, Boundaries),
+            {{patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4}, Count1+Count2+Count3+Count4}
+    end.
 
 %% debug dump
 

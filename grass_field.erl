@@ -136,7 +136,7 @@ find({patch, {Xc, Yc}, Patch1, Patch2, Patch3, Patch4}, {{Xl, Yl}, {Xr, Yr}} = B
             {NewPatch3, Count3} = find(Patch3, Boundaries),
             {NewPatch4, Count4} = find(Patch4, Boundaries),
             {{patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4}, Count1+Count2+Count3+Count4}
-    end.
+    end;
 
 % empty nodes and wrong leaves
 find(Field, _Bounds) ->

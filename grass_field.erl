@@ -11,6 +11,18 @@ start(MaxEdge) ->
 
     loop({ empty, {0, 0}, {MaxValue, MaxValue} }).
 
+%
+% GrassField :=
+%           % empty quadrant, defined by two corners
+%               { empty, Point, Point } |
+%           % position of the only leaf in quadrant, defined by two corners
+%               { leaf, Point, Point, Point } |
+%           % quadrant, defined by its center, divided in four smaller quadrants
+%               { patch, Point, Grass, Grass, Grass, Grass }
+%
+% Point := { Integer, Integer }
+%
+
 loop(GrassField) ->
     receive
         {grow, Pid, Location} ->

@@ -128,7 +128,7 @@ find({leaf, {Xl, Yl}, _Corner0, _Corner1} = Field, {{X0, Y0}, {X1, Y1}})
 find({patch, _Center, {empty, {X0, Y0}}, {empty, {_X1, _Y1}}, {empty, {X2, Y2}}, {empty, {_X3, _Y3}}}, _Boundaries) ->
     { {empty, {X0, Y0}, {X2, Y2}}, 0 };
 
-find({patch, {Xc, Yc}, Patch1, Patch2, Patch3, Patch4}, {{Xl, Yl}, {Xr, Yr}} = Boundaries ) ->
+find({patch, {Xc, Yc}, Patch1, Patch2, Patch3, Patch4}, {{Xl, Yl}, {Xr, Yr}} = Boundaries) ->
     if
         (Xr < Xc) and (Yr < Yc) ->
             {NewPatch1, Count1} = find(Patch1, Boundaries),

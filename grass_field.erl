@@ -72,13 +72,13 @@ make_patch({X0, Y0}, {X1, Y1}) ->
 %% remove an item from the grass field
 
 cut({empty, _Corner0, _Corner1} = Empty, _Location) ->
-    {Empty, not_available};
+    {Empty, not_found};
 
 cut({leaf, _Leaf, Corner0, Corner1}, _Leaf) ->
     {{empty, Corner0, Corner1}, ok};
 
 cut({leaf, _Leaf, _Corner0, _Corner1} = Current, _Location) ->
-    {Current, not_available};
+    {Current, not_found};
 
 cut({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Location) ->
     case {X < Xc, Y < Yc} of

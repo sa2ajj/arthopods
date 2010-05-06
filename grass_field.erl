@@ -102,9 +102,6 @@ cut({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Locatio
 %% finding all leaves in the given rectangle
 %% find(GrassField, Boundaries) --> {NewField, NumberOfFoundLeaves}
 
-find({empty, _Corner0, _Corner1} = Empty, _Boundaries) ->
-    { Empty, 0 };
-
 find({leaf, {Xl, Yl}, _Corner0, _Corner1} = Field, {{X0, Y0}, {X1, Y1}})
     when (X0 =< Xl) and (Xl =< X1) and (Y0 =< Yl) and (Yl =< Y1) ->
         { Field, 1 };

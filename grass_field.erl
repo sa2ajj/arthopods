@@ -106,12 +106,8 @@ find({empty, _Corner0, _Corner1} = Empty, _Boundaries) ->
     { Empty, 0 };
 
 find({leaf, {Xl, Yl}, Corner0, Corner1} = Field, {{X0, Y0}, {X1, Y1}}) ->
-    if
-        (X0 =< Xl) and (Xl =< X1) and (Y0 =< Yl) and (Yl =< Y1) ->
-            { {empty, Corner0, Corner1}, 1 };
-        true ->
-            { Field, 0 }
-    end;
+    when (X0 =< Xl) and (Xl =< X1) and (Y0 =< Yl) and (Yl =< Y1) ->
+        { {empty, Corner0, Corner1}, 1 };
 
 find({patch, _Center, {empty, {X0, Y0}}, {empty, {_X1, _Y1}}, {empty, {X2, Y2}}, {empty, {_X3, _Y3}}}, _Boundaries) ->
     { {empty, {X0, Y0}, {X2, Y2}}, 0 };
@@ -141,6 +137,11 @@ find({patch, {Xc, Yc}, Patch1, Patch2, Patch3, Patch4}, {{Xl, Yl}, {Xr, Yr}} = B
             {NewPatch4, Count4} = find(Patch4, Boundaries),
             {{patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4}, Count1+Count2+Count3+Count4}
     end.
+
+% empty nodes and wrong leaves
+find(Field, _Bounds) ->
+    { Field, 0 }
+end;
 
 %% debug dump
 

@@ -125,65 +125,116 @@ cut({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Locatio
 find({leaf, {Xl, Yl} = Leaf, _Corner0, _Corner1} = Field, {{X0, Y0}, {X1, Y1}}, Pid)
     when (X0 =< Xl) and (Xl =< X1) and (Y0 =< Yl) and (Yl =< Y1) ->
         Pid ! { leaf, Leaf },
-        Field;
+        { old, Field };
 
 find({patch, _Center, {empty, Corner0, _}, {empty, _, _}, {empty, _, Corner1}, {empty, _, _}}, _Boundaries, _Pid) ->
-    {empty, Corner0, Corner1};
+    { new, {empty, Corner0, Corner1} };
 
-find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {{Xl, Yb}, {Xr, Yt}} = Boundaries, Pid) ->
+find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4} = Field, {{Xl, Yb}, {Xr, Yt}} = Boundaries, Pid) ->
     % {X,Y}{l,r,b,t} -- left, right, bottom, top corners
     case { Xl >= Xc, Yb >= Yc, Xr < Xc, Yt < Yc } of
         % bottom left quadrant
         { _, _, true, true } ->
-            NewPatch1 = find(Patch1, Boundaries, Pid),
-            {patch, Center, NewPatch1, Patch2, Patch3, Patch4};
+            case find(Patch1, Boundaries, Pid) of
+                { new, NewPatch1 } ->
+                    { new, {patch, Center, NewPatch1, Patch2, Patch3, Patch4}};
+                _ ->
+                    { old, Field }
+            end;
 
         % bottom right quadrant
         { true, _, _, true } ->
-            NewPatch2 = find(Patch2, Boundaries, Pid),
-            {patch, Center, Patch1, NewPatch2, Patch3, Patch4};
+            case find(Patch2, Boundaries, Pid) of
+                { new, NewPatch2 } ->
+                    { new, {patch, Center, Patch1, NewPatch2, Patch3, Patch4}};
+                _ ->
+                    { old, Field }
+            end;
 
         % top right quadrant
         { true, true, _, _ } ->
-            NewPatch3 = find(Patch3, Boundaries, Pid),
-            {patch, Center, Patch1, Patch2, NewPatch3, Patch4};
+            case find(Patch3, Boundaries, Pid) of
+                { new, NewPatch3 } ->
+                    { new, {patch, Center, Patch1, Patch2, NewPatch3, Patch4}};
+                _ ->
+                    { old, Field }
+            end;
 
         % top left quadrant
         { _, true, true, _ } ->
-            NewPatch4 = find(Patch4, Boundaries, Pid),
-            {patch, Center, Patch1, Patch2, Patch3, NewPatch4};
+            case find(Patch4, Boundaries, Pid) of
+                { new, NewPatch4 } ->
+                    { new, {patch, Center, Patch1, Patch2, Patch3, NewPatch4}};
+                _ ->
+                    { old, Field }
+            end;
 
         % two bottom quadrants
         { _, _, _, true } ->
-            NewPatch1 = find(Patch1, Boundaries, Pid),
-            NewPatch2 = find(Patch2, Boundaries, Pid),
-            {patch, Center, NewPatch1, NewPatch2, Patch3, Patch4};
+            { Modified1, NewPatch1 } = find(Patch1, Boundaries, Pid),
+            { Modified2, NewPatch2 } = find(Patch2, Boundaries, Pid),
+
+            case { Modified1, Modified2 } of
+                { old, old } ->
+                    { old, Field };
+
+                _ ->
+                    { new, {patch, Center, NewPatch1, NewPatch2, Patch3, Patch4} }
+            end;
 
         % two right quadrants
         { true, _, _ , _ } ->
-            NewPatch2 = find(Patch2, Boundaries, Pid),
-            NewPatch3 = find(Patch3, Boundaries, Pid),
-            {patch, Center, Patch1, NewPatch2, NewPatch3, Patch4};
+            { Modified2, NewPatch2 } = find(Patch2, Boundaries, Pid),
+            { Modified3, NewPatch3 } = find(Patch3, Boundaries, Pid),
+
+            case { Modified2, Modified3 } of
+                { old, old } ->
+                    { old, Field };
+
+                _ ->
+                    { new, {patch, Center, Patch1, NewPatch2, NewPatch3, Patch4} }
+            end;
 
         % two upper quadrants
         { _, true, _, _ } ->
-            NewPatch3 = find(Patch3, Boundaries, Pid),
-            NewPatch4 = find(Patch4, Boundaries, Pid),
-            {patch, Center, Patch1, Patch2, NewPatch3, NewPatch4};
+            { Modified3, NewPatch3 } = find(Patch3, Boundaries, Pid),
+            { Modified4, NewPatch4 } = find(Patch4, Boundaries, Pid),
+
+            case { Modified3, Modified4 } of
+                { old, old } ->
+                    { old, Field };
+
+                _ ->
+                    { new, {patch, Center, Patch1, Patch2, NewPatch3, NewPatch4} }
+            end;
 
         % two left quadrants
         { _, _, true, _ } ->
-            NewPatch4 = find(Patch4, Boundaries, Pid),
-            NewPatch1 = find(Patch1, Boundaries, Pid),
-            {patch, Center, NewPatch1, Patch2, Patch3, NewPatch4};
+            { Modified4, NewPatch4 } = find(Patch4, Boundaries, Pid),
+            { Modified1, NewPatch1 } = find(Patch1, Boundaries, Pid),
+
+            case { Modified4, Modified1 } of
+                { old, old } ->
+                    { old, Field };
+
+                _ ->
+                    { new, {patch, Center, NewPatch1, Patch2, Patch3, NewPatch4} }
+            end;
 
         % no optimization is possible, parsing all four quadrants
         _ ->
-            NewPatch1 = find(Patch1, Boundaries, Pid),
-            NewPatch2 = find(Patch2, Boundaries, Pid),
-            NewPatch3 = find(Patch3, Boundaries, Pid),
-            NewPatch4 = find(Patch4, Boundaries, Pid),
-            {patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4}
+            { Modified1, NewPatch1 } = find(Patch1, Boundaries, Pid),
+            { Modified2, NewPatch2 } = find(Patch2, Boundaries, Pid),
+            { Modified3, NewPatch3 } = find(Patch3, Boundaries, Pid),
+            { Modified4, NewPatch4 } = find(Patch4, Boundaries, Pid),
+
+            case { Modified1, Modified2, Modified3, Modified4 } of
+                { old, old, old, old } ->
+                    { new, {patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4} };
+
+                _ ->
+                    { old, Field }
+            end
     end;
 
 % empty nodes and wrong leaves

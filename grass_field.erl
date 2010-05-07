@@ -230,10 +230,10 @@ find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4} = Field, {{Xl, Y
 
             case { Modified1, Modified2, Modified3, Modified4 } of
                 { old, old, old, old } ->
-                    { new, {patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4} };
+                    { old, Field };
 
                 _ ->
-                    { old, Field }
+                    { new, {patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4} }
             end
     end;
 

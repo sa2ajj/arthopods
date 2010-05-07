@@ -35,8 +35,8 @@ loop(GrassField) ->
             Pid ! {ack_cut, Result},
             loop(NewField);
 
-        {find, Pid, Bounds} ->
-            {NewField, Amount} = find(GrassField, Bounds),
+        {find, Pid, Boundaries} ->
+            {NewField, Amount} = find(GrassField, Boundaries),
             Pid ! {ack_find, Amount},
             loop(NewField);
 
@@ -177,7 +177,7 @@ find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {{Xl, Yb}, {Xr,
     end;
 
 % empty nodes and wrong leaves
-find(Field, _Bounds) ->
+find(Field, _Boundaries) ->
     { Field, 0 }.
 
 %% debug dump

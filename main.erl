@@ -6,7 +6,7 @@
 
 start() ->
     io:format("great stuff will be here :)~n"),
-    world:start({1000, 1000}),
+    world:start({1024, 768}),
     receive
         { world, World } ->
             io:format("World has been created!~n"),

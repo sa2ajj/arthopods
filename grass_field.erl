@@ -136,8 +136,8 @@ find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4} = Field, {{Xl, Y
         % bottom left quadrant
         { _, _, true, true } ->
             case find(Patch1, Boundaries, Pid) of
-                { new, NewPatch1 } ->
-                    { new, {patch, Center, NewPatch1, Patch2, Patch3, Patch4}};
+                { new, NewPatch } ->
+                    { new, {patch, Center, NewPatch, Patch2, Patch3, Patch4}};
                 _ ->
                     { old, Field }
             end;
@@ -145,8 +145,8 @@ find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4} = Field, {{Xl, Y
         % bottom right quadrant
         { true, _, _, true } ->
             case find(Patch2, Boundaries, Pid) of
-                { new, NewPatch2 } ->
-                    { new, {patch, Center, Patch1, NewPatch2, Patch3, Patch4}};
+                { new, NewPatch } ->
+                    { new, {patch, Center, Patch1, NewPatch, Patch3, Patch4}};
                 _ ->
                     { old, Field }
             end;
@@ -154,8 +154,8 @@ find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4} = Field, {{Xl, Y
         % top right quadrant
         { true, true, _, _ } ->
             case find(Patch3, Boundaries, Pid) of
-                { new, NewPatch3 } ->
-                    { new, {patch, Center, Patch1, Patch2, NewPatch3, Patch4}};
+                { new, NewPatch } ->
+                    { new, {patch, Center, Patch1, Patch2, NewPatch, Patch4}};
                 _ ->
                     { old, Field }
             end;
@@ -163,8 +163,8 @@ find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4} = Field, {{Xl, Y
         % top left quadrant
         { _, true, true, _ } ->
             case find(Patch4, Boundaries, Pid) of
-                { new, NewPatch4 } ->
-                    { new, {patch, Center, Patch1, Patch2, Patch3, NewPatch4}};
+                { new, NewPatch } ->
+                    { new, {patch, Center, Patch1, Patch2, Patch3, NewPatch}};
                 _ ->
                     { old, Field }
             end;

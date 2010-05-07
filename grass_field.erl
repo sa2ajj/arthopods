@@ -18,7 +18,7 @@ start(MaxEdge) ->
 %           % position of the only leaf in quadrant, defined by two corners
 %               { leaf, Point, Point, Point } |
 %           % quadrant, defined by its center, divided in four smaller quadrants
-%               { patch, Point, Grass, Grass, Grass, Grass }
+%               { patch, Point, GrassField, GrassField, GrassField, GrassField }
 %
 % Point := { Integer, Integer }
 %

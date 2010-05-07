@@ -36,8 +36,8 @@ loop(GrassField) ->
             loop(NewField);
 
         {find, Pid, Boundaries} ->
-            {NewField, Amount} = find(GrassField, Boundaries),
-            Pid ! {ack_find, Amount},
+            NewField = find(GrassField, Boundaries, Pid),
+            Pid ! {ack_find},
             loop(NewField);
 
         {dump, Pid} ->
@@ -119,66 +119,76 @@ cut({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {X, Y} = Locatio
     end.
 
 %% finding all leaves in the given rectangle
-%% find(GrassField, Boundaries) --> {NewField, NumberOfFoundLeaves}
+%% find(GrassField, Boundaries, Pid) --> NewField
+%%   the function sends a message of format {leaf, Location} for each found leaf
 
-find({leaf, {Xl, Yl}, _Corner0, _Corner1} = Field, {{X0, Y0}, {X1, Y1}})
+find({leaf, {Xl, Yl} = Leaf, _Corner0, _Corner1} = Field, {{X0, Y0}, {X1, Y1}}, Pid)
     when (X0 =< Xl) and (Xl =< X1) and (Y0 =< Yl) and (Yl =< Y1) ->
-        { Field, 1 };
+        Pid ! { leaf, Leaf },
+        Field;
 
-find({patch, _Center, {empty, Corner10, _Corner11}, {empty, _Corner20, _Corner21}, {empty, _Corner30, Corner31}, {empty, _Corner40, _Corner41}}, _Boundaries) ->
-    { {empty, Corner10, Corner31}, 0 };
+find({patch, _Center, {empty, Corner0, _}, {empty, _, _}, {empty, _, Corner1}, {empty, _, _}}, _Boundaries, _Pid) ->
+    {empty, Corner0, Corner1};
 
-find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {{Xl, Yb}, {Xr, Yt}} = Boundaries) ->
+find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4}, {{Xl, Yb}, {Xr, Yt}} = Boundaries, Pid) ->
     % {X,Y}{l,r,b,t} -- left, right, bottom, top corners
     case { Xl >= Xc, Yb >= Yc, Xr < Xc, Yt < Yc } of
         % bottom left quadrant
         { _, _, true, true } ->
-            {NewPatch1, Count1} = find(Patch1, Boundaries),
-            {{patch, Center, NewPatch1, Patch2, Patch3, Patch4}, Count1};
+            NewPatch1 = find(Patch1, Boundaries, Pid),
+            {patch, Center, NewPatch1, Patch2, Patch3, Patch4};
+
         % bottom right quadrant
         { true, _, _, true } ->
-            {NewPatch2, Count2} = find(Patch2, Boundaries),
-            {{patch, Center, Patch1, NewPatch2, Patch3, Patch4}, Count2};
+            NewPatch2 = find(Patch2, Boundaries, Pid),
+            {patch, Center, Patch1, NewPatch2, Patch3, Patch4};
+
         % top right quadrant
         { true, true, _, _ } ->
-            {NewPatch3, Count3} = find(Patch3, Boundaries),
-            {{patch, Center, Patch1, Patch2, NewPatch3, Patch4}, Count3};
+            NewPatch3 = find(Patch3, Boundaries, Pid),
+            {patch, Center, Patch1, Patch2, NewPatch3, Patch4};
+
         % top left quadrant
         { _, true, true, _ } ->
-            {NewPatch4, Count4} = find(Patch4, Boundaries),
-            {{patch, Center, Patch1, Patch2, Patch3, NewPatch4}, Count4};
+            NewPatch4 = find(Patch4, Boundaries, Pid),
+            {patch, Center, Patch1, Patch2, Patch3, NewPatch4};
+
         % two bottom quadrants
         { _, _, _, true } ->
-            {NewPatch1, Count1} = find(Patch1, Boundaries),
-            {NewPatch2, Count2} = find(Patch2, Boundaries),
-            {{patch, Center, NewPatch1, NewPatch2, Patch3, Patch4}, Count1+Count2};
+            NewPatch1 = find(Patch1, Boundaries, Pid),
+            NewPatch2 = find(Patch2, Boundaries, Pid),
+            {patch, Center, NewPatch1, NewPatch2, Patch3, Patch4};
+
         % two right quadrants
         { true, _, _ , _ } ->
-            {NewPatch2, Count2} = find(Patch2, Boundaries),
-            {NewPatch3, Count3} = find(Patch3, Boundaries),
-            {{patch, Center, Patch1, NewPatch2, NewPatch3, Patch4}, Count2+Count3};
+            NewPatch2 = find(Patch2, Boundaries, Pid),
+            NewPatch3 = find(Patch3, Boundaries, Pid),
+            {patch, Center, Patch1, NewPatch2, NewPatch3, Patch4};
+
         % two upper quadrants
         { _, true, _, _ } ->
-            {NewPatch3, Count3} = find(Patch3, Boundaries),
-            {NewPatch4, Count4} = find(Patch4, Boundaries),
-            {{patch, Center, Patch1, Patch2, NewPatch3, NewPatch4}, Count3+Count4};
+            NewPatch3 = find(Patch3, Boundaries, Pid),
+            NewPatch4 = find(Patch4, Boundaries, Pid),
+            {patch, Center, Patch1, Patch2, NewPatch3, NewPatch4};
+
         % two left quadrants
         { _, _, true, _ } ->
-            {NewPatch4, Count4} = find(Patch4, Boundaries),
-            {NewPatch1, Count1} = find(Patch1, Boundaries),
-            {{patch, Center, NewPatch1, Patch2, Patch3, NewPatch4}, Count4+Count1};
+            NewPatch4 = find(Patch4, Boundaries, Pid),
+            NewPatch1 = find(Patch1, Boundaries, Pid),
+            {patch, Center, NewPatch1, Patch2, Patch3, NewPatch4};
+
         % no optimization is possible, parsing all four quadrants
         _ ->
-            {NewPatch1, Count1} = find(Patch1, Boundaries),
-            {NewPatch2, Count2} = find(Patch2, Boundaries),
-            {NewPatch3, Count3} = find(Patch3, Boundaries),
-            {NewPatch4, Count4} = find(Patch4, Boundaries),
-            {{patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4}, Count1+Count2+Count3+Count4}
+            NewPatch1 = find(Patch1, Boundaries, Pid),
+            NewPatch2 = find(Patch2, Boundaries, Pid),
+            NewPatch3 = find(Patch3, Boundaries, Pid),
+            NewPatch4 = find(Patch4, Boundaries, Pid),
+            {patch, Center, NewPatch1, NewPatch2, NewPatch3, NewPatch4}
     end;
 
 % empty nodes and wrong leaves
-find(Field, _Boundaries) ->
-    { Field, 0 }.
+find(Field, _Boundaries, _Pid) ->
+    Field.
 
 %% debug dump
 

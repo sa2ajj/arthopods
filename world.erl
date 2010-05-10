@@ -14,9 +14,10 @@ world_loop0(Parent, Size) ->
     Field = spawn(grass_field, start, [ lists:max(tuple_to_list(Size)) ]),
     Parent ! { world, self() },
     io:format("We are as big as ~p~n", [Size]),
-    world_loop(Parent, Size, Field).
+    Bugs = dict:new(),
+    world_loop(Parent, Size, Field, Bugs).
 
-world_loop(Parent, Size, Field) ->
+world_loop(Parent, Size, Field, Bugs) ->
     io:format("World: waiting... "),
 
     receive
@@ -45,6 +46,6 @@ world_loop(Parent, Size, Field) ->
             io:format("World got: ~p~n", [ Other ])
     end,
 
-    world_loop(Parent, Size, Field).
+    world_loop(Parent, Size, Field, Bugs).
 
 % vim:ts=4:sw=4:et

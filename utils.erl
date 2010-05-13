@@ -1,13 +1,13 @@
 -module(utils).
 
--export([select/1, index/2, round_to_power_of_2/1]).
+-export([select_uniform/1, index/2, round_to_power_of_2/1]).
 
 -import(random, [uniform/1]).
 
-select(List) when is_list(List) ->
+select_uniform(List) when is_list(List) ->
     lists:nth(uniform(length(List)), List);
 
-select(Tuple) when is_tuple(Tuple) ->
+select_uniform(Tuple) when is_tuple(Tuple) ->
     element(uniform(tuple_size(Tuple)), Tuple).
 
 index(Item, List) when is_list(List) -> index(Item, List, 1).

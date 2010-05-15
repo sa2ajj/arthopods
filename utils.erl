@@ -3,13 +3,7 @@
 -author("Alexey Vyskubov <alexey@mawhrin.net>").
 -author("Mikhail Sobolev <mss@mawhrin.net>").
 
--export([select_uniform/1, index/2, round_to_power_of_2/1]).
-
-select_uniform(List) when is_list(List) ->
-    lists:nth(random:uniform(length(List)), List);
-
-select_uniform(Tuple) when is_tuple(Tuple) ->
-    element(random:uniform(tuple_size(Tuple)), Tuple).
+-export([index/2, round_to_power_of_2/1]).
 
 index(Item, List) when is_list(List) -> index(Item, List, 1).
 

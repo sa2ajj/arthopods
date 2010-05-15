@@ -2,6 +2,9 @@
 
 -module(food_generator).
 
+-author("Alexey Vyskubov <alexey@mawhrin.net>").
+-author("Mikhail Sobolev <mss@mawhrin.net>").
+
 -export([start/2, food_loop0/2]).
 
 start(World, Ticks) ->

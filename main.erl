@@ -2,6 +2,9 @@
 
 -module(main).
 
+-author("Alexey Vyskubov <alexey@mawhrin.net>").
+-author("Mikhail Sobolev <mss@mawhrin.net>").
+
 -export([start/0]).
 
 start() ->

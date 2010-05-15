@@ -2,6 +2,9 @@
 
 -module(world).
 
+-author("Alexey Vyskubov <alexey@mawhrin.net>").
+-author("Mikhail Sobolev <mss@mawhrin.net>").
+
 -export([start/1, world_loop0/2]).
 
 start(Size) ->

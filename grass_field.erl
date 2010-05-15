@@ -2,6 +2,9 @@
 
 -module(grass_field).
 
+-author("Alexey Vyskubov <alexey@mawhrin.net>").
+-author("Mikhail Sobolev <mss@mawhrin.net>").
+
 -export([start/1]).
 
 -import(utils, [round_to_power_of_2/1]).

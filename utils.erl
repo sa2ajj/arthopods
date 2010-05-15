@@ -1,5 +1,8 @@
 -module(utils).
 
+-author("Alexey Vyskubov <alexey@mawhrin.net>").
+-author("Mikhail Sobolev <mss@mawhrin.net>").
+
 -export([select_uniform/1, index/2, round_to_power_of_2/1]).
 
 select_uniform(List) when is_list(List) ->

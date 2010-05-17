@@ -27,6 +27,12 @@ move_bug(Bug, Location) ->
         { moved_bug } -> ok
     end.
 
+grow_leaf(Location) ->
+    world_viewer ! { grow_grass, self(), Location),
+    receive
+        { planted_grass, Leaf } -> Leaf
+    end.
+
 % stuff for that separate process
 
 real_coords(Location) ->

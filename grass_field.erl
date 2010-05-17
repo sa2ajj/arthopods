@@ -19,9 +19,9 @@ start(MaxEdge) ->
 %           % empty quadrant, defined by two corners
 %               { empty, Point, Point } |
 %           % position of the only leaf in quadrant, defined by two corners
-%               { leaf, Point, Point, Point } |
+%               { leaf, Location = Point, BottomLeftCorner = Point, TopRightCorner = Point } |
 %           % quadrant, defined by its center, divided in four smaller quadrants
-%               { patch, Point, GrassField, GrassField, GrassField, GrassField }
+%               { patch, CenterPoint = Point, GrassField, GrassField, GrassField, GrassField }
 %
 % Point := { Integer, Integer }
 %

@@ -15,10 +15,14 @@ start() ->
             io:format("World has been created!~n"),
             World ! { welcome, "Thank you for being there" },
             food_generator:start(World, 2000),      % generate a piece of food every 2 secs
+            populate_worle(World),
             loop();
 
         Other -> io:format("Got: ~w~n", Other)
     end.
+
+populate_world(World) ->
+    ok.
 
 loop() -> loop().
 

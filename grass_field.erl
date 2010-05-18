@@ -30,7 +30,7 @@ loop(GrassField) ->
     receive
         {grow, Pid, Location} ->
             NewField = grow(GrassField, Location),
-            Pid ! ack_grow,
+            Pid ! {ack_grow, Location},
             loop(NewField);
 
         {cut, Pid, Location} ->

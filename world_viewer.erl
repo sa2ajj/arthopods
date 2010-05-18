@@ -42,8 +42,8 @@ real_coords({X, Y}, Offset) ->
     {(X+Offset)*?CELL_SIZE, (Y+Offset)*?CELL_SIZE}.
 
 bug_rect(Location) ->
-    { RealX, RealY } = real_coords(Location),
-    [ {RealX-?CELL_SIZE, RealY-?CELL_SIZE}, {RealX+2*?CELL_SIZE-1, RealY+2*?CELL_SIZE-1} ].
+    { RealX, RealY } = real_coords(Location, 0),
+    [ {RealX, RealY}, {RealX+3*?CELL_SIZE-1, RealY+3*?CELL_SIZE-1} ].
 
 grass_rect(Location) ->
     { RealX, RealY } = RealLocation = real_coords(Location),

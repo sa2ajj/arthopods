@@ -3,7 +3,7 @@
 -author("Alexey Vyskubov <alexey@mawhrin.net>").
 -author("Mikhail Sobolev <mss@mawhrin.net>").
 
--export([start/1, make_bug/1, move_bug/2]).
+-export([start/1, make_bug/1, move_bug/2, grow_leaf/1]).
 
 -export([init/1]).
 

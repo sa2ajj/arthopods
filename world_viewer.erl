@@ -28,7 +28,7 @@ move_bug(Bug, Location) ->
     end.
 
 grow_leaf(Location) ->
-    world_viewer ! { grow_grass, self(), Location),
+    world_viewer ! { grow_grass, self(), Location },
     receive
         { planted_grass, Leaf } -> Leaf
     end.

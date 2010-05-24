@@ -5,15 +5,13 @@
 
 -export([start/1, make_bug/1, move_bug/2, grow_leaf/1]).
 
--export([init/1]).
-
 -define(CELL_SIZE, 2).
 
 % each dot (grass leaf) is represented with a 2x2 square
 % each bug is represented by a 6x6 square
 
 start(Size) ->
-    register(world_viewer, spawn_link(?MODULE, init, [Size])).
+    register(world_viewer, spawn_link(fun() -> init(Size))).
 
 make_bug(Coords) ->
     world_viewer ! { make_bug, self(), Coords },

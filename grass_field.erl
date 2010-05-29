@@ -292,7 +292,7 @@ find(Field, _Boundaries, _Requestor) ->
 indent(0) -> ok;
 
 indent(N) ->
-    io:format(" ", []),
+    io:format(" "),
     indent(N-1).
 
 dump(GrassField) ->

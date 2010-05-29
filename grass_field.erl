@@ -1,19 +1,82 @@
 %
 
 -module(grass_field).
+-behaviour(gen_server).
 
 -author("Alexey Vyskubov <alexey@mawhrin.net>").
 -author("Mikhail Sobolev <mss@mawhrin.net>").
 
--export([start/1]).
+%% server interface
+-export([start/1, stop/0, grow/1, cut/1, find/1, dump/0]).
+
+%% gen_server callbacks
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 -import(utils, [round_to_power_of_2/1]).
 
+%% interface implementation
+
 start(MaxEdge) ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, MaxEdge, []).
+
+stop() ->
+    gen_server:cast(?MODULE, {stop, normal}).
+
+grow(Location) ->
+    gen_server:cast(?MODULE, {grow, self(), Location}).
+
+cut(Location) ->
+    gen_server:cast(?MODULE, {cut, self(), Location}).
+
+find(Boundaries) ->
+    gen_server:cast(?MODULE, {find, self(), Boundaries}).
+
+dump() ->
+    gen_server:cast(?MODULE, {dump, self()}).
+
+%% callback implementation
+
+init(MaxEdge) ->
     MaxValue = round_to_power_of_2(MaxEdge),
 
-    loop({ empty, {0, 0}, {MaxValue, MaxValue} }).
+    {ok, empty_field(MaxValue)}.
 
+terminate(_Reason, _Field) ->
+    % io:format("terminate: ~p, ~p~n", [_Reason, _Field]),
+    ok.
+
+handle_call(Request, From, State) ->
+    io:format("handle_call: ~p, ~p, ~p~n", [Request, From, State]),
+    {noreply, State}.
+
+handle_cast({stop, Reason}, State) ->
+    {stop, Reason, State};
+
+handle_cast({grow, Pid, Location}, Field) ->
+    NewField = grow(Field, Location),
+    Pid ! {ack_grow, Location},
+    {noreply, NewField};
+
+handle_cast({cut, Pid, Location}, Field) ->
+    {NewField, Result} = cut(Field, Location),
+    Pid ! {ack_cut, Result},
+    {noreply, NewField};
+
+handle_cast({find, Pid, Boundaries}, Field) ->
+    NewField = find(Field, Boundaries, Pid),
+    Pid ! {ack_find},
+    {noreply, NewField};
+
+handle_cast({dump, Pid}, Field) ->
+    dump(Field),
+    Pid ! ack_dump,
+    {noreply, Field};
+
+handle_cast(Request, State) ->
+    io:format("handle_cast: ~p, ~p~n", [Request, State]),
+    {noreply, State}.
+
+%% grass field handling
 %
 % GrassField :=
 %           % empty quadrant, defined by two corners
@@ -26,28 +89,8 @@ start(MaxEdge) ->
 % Point := { Integer, Integer }
 %
 
-loop(GrassField) ->
-    receive
-        {grow, Pid, Location} ->
-            NewField = grow(GrassField, Location),
-            Pid ! {ack_grow, Location},
-            loop(NewField);
-
-        {cut, Pid, Location} ->
-            {NewField, Result} = cut(GrassField, Location),
-            Pid ! {ack_cut, Result},
-            loop(NewField);
-
-        {find, Pid, Boundaries} ->
-            NewField = find(GrassField, Boundaries, Pid),
-            Pid ! {ack_find},
-            loop(NewField);
-
-        {dump, Pid} ->
-            dump(GrassField),
-            Pid ! ack_dump,
-            loop(GrassField)
-    end.
+empty_field(Size) ->
+    { empty, {0, 0}, {Size, Size} }.
 
 grow({empty, Corner0, Corner1}, Location) ->
     { leaf, Location, Corner0, Corner1 };
@@ -272,5 +315,13 @@ dump({patch, {Xc, Yc}, Patch1, Patch2, Patch3, Patch4}, Level) ->
     dump(Patch2, Level1),
     dump(Patch3, Level1),
     dump(Patch4, Level1).
+
+%% not implemented callbacks for gen_server
+handle_info(Info, State) ->
+    io:format("handle_info: ~p, ~p~n", [Info, State]),
+    {noreply, State}.
+
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
 
 % vim:ts=4:sw=4:et

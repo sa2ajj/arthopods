@@ -14,13 +14,13 @@ world_loop0(Parent, Size) ->
     io:format("The world is about to revolve.~n"),
     process_flag(trap_exit, true),          % follow exits of interesting processes
     link(Parent),
-    Field = spawn(grass_field, start, [ lists:max(tuple_to_list(Size)) ]),
+    grass_field:start(lists:max(tuple_to_list(Size))),
     Parent ! { world, self() },
     io:format("We are as big as ~p~n", [Size]),
     Bugs = dict:new(),
-    world_loop(Parent, Size, Field, Bugs).
+    world_loop(Parent, Size, Bugs).
 
-world_loop(Parent, Size, Field, Bugs) ->
+world_loop(Parent, Size, Bugs) ->
     io:format("World: waiting... "),
 
     receive
@@ -33,14 +33,14 @@ world_loop(Parent, Size, Field, Bugs) ->
 
         { food, Location } ->
             io:format(" food (~p)!~n", [Location]),
-            Field ! { grow, self(), Location };
+            grass_field:grow(Location);
 
         { size, Pid } ->
             io:format(" size requested from ~p~n", [ Pid ]),
             Pid ! { size, Size };
 
-        ack_grow ->
-            Field ! { dump, self() };
+        { ack_grow, _Location } ->
+            grass_field:dump();
 
         ack_dump ->
             ok;
@@ -49,6 +49,6 @@ world_loop(Parent, Size, Field, Bugs) ->
             io:format("World got: ~p~n", [ Other ])
     end,
 
-    world_loop(Parent, Size, Field, Bugs).
+    world_loop(Parent, Size, Bugs).
 
 % vim:ts=4:sw=4:et

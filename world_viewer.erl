@@ -1,37 +1,92 @@
 -module(world_viewer).
+-behaviour(gen_server).
 
 -author("Alexey Vyskubov <alexey@mawhrin.net>").
 -author("Mikhail Sobolev <mss@mawhrin.net>").
 
--export([start/1, make_bug/1, move_bug/2, grow_leaf/1]).
-
--define(CELL_SIZE, 2).
-
 % each dot (grass leaf) is represented with a 2x2 square
 % each bug is represented by a 6x6 square
+-define(CELL_SIZE, 2).
+
+% colours to use
+-define(BUG_COLOUR, {16#b0, 16#30, 16#60}).
+-define(GRAS_COLOUR, {0, 16#64, 0}).
+
+%% server interface
+-export([start/1, stop/0, make_bug/1, move_bug/2, grow_leaf/1]).
+
+%% gen_server callbacks
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
+
+%% interface implementation
 
 start(Size) ->
-    register(world_viewer, spawn_link(fun() -> init(Size))).
+    gen_server:start_link({local, ?MODULE}, ?MODULE, Size, []).
 
-make_bug(Coords) ->
-    world_viewer ! { make_bug, self(), Coords },
-    receive
-        { made_bug, Bug } -> Bug
-    end.
+stop() ->
+    gen_server:cast(?MODULE, {stop, normal}).
+
+make_bug(Location) ->
+    gen_server:call(?MODULE, {make_bug, Location}).
 
 move_bug(Bug, Location) ->
-    world_viewer ! { move_bug, self(), Bug, Location },
-    receive
-        { moved_bug } -> ok
-    end.
+    gen_server:call(?MODULE, {move_bug, Bug, Location}).
 
 grow_leaf(Location) ->
-    world_viewer ! { grow_grass, self(), Location },
-    receive
-        { planted_grass, Leaf } -> Leaf
-    end.
+    gen_server:call(?MODULE, {grow_grass, Location}).
 
-% stuff for that separate process
+%% gen_server callbacks implementation
+
+init(Size) ->
+    Gs = gs:start(),
+    {RealWidth, RealHeight} = real_coords(Size, 2),
+    Window = gs:create(window, Gs, [ {width, RealWidth}, {height, RealHeight}, {title, "Arthopods World"}, {map, true} ]),
+    Canvas = gs:create(canvas, Window, [ {x, 0}, {y, 0}, {width, RealWidth}, {height, RealHeight} ]),
+    {ok, Canvas}.
+
+terminate(_Reason, _Canvas) ->
+    % io:format("terminate: ~p, ~p~n", [_Reason, _Canvas]),
+    gs:stop().
+
+handle_call({make_bug, Location}, _From, Canvas) ->
+    {reply, gs:create(rectangle, Canvas, [
+        {coords, bug_rect(Location)},
+        {bw, 1},
+        {fg, ?BUG_COLOUR},
+        {fill, ?BUG_COLOUR}
+    ]), Canvas};
+
+handle_call({move_bug, Bug, Location}, _From, Canvas) ->
+    {reply, gs:config(Bug, [{coords, bug_rect(Location)}]), Canvas};
+
+handle_call({grow_grass, Location}, _From, Canvas) ->
+    {reply, gs:create(rectangle, Canvas, [
+        {coords, grass_rect(Location)},
+        {bw, 1},
+        {fg, ?GRAS_COLOUR},
+        {fill, ?GRAS_COLOUR}
+    ]), Canvas};
+
+handle_call(Request, From, Canvas) ->
+    io:format("handle_call: ~p, ~p, ~p~n", [Request, From, Canvas]),
+    {noreply, Canvas}.
+
+handle_cast({stop, Reason}, Canvas) ->
+    {stop, Reason, Canvas};
+
+handle_cast(Request, Canvas) ->
+    io:format("handle_cast: ~p, ~p~n", [Request, Canvas]),
+    {noreply, Canvas}.
+
+% not implemented callbacks for gen_server
+handle_info(Info, State) ->
+    io:format("handle_info: ~p, ~p~n", [Info, State]),
+    {noreply, State}.
+
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
+
+%% a few helper functions
 
 real_coords(Location) ->
     real_coords(Location, 1).
@@ -46,38 +101,5 @@ bug_rect(Location) ->
 grass_rect(Location) ->
     { RealX, RealY } = RealLocation = real_coords(Location),
     [ RealLocation, {RealX+?CELL_SIZE-1, RealY+?CELL_SIZE-1} ].
-
-init(Size) ->
-    Gs = gs:start(),
-    {RealWidth, RealHeight} = real_coords(Size, 2),
-    Window = gs:create(window, Gs, [ {width, RealWidth}, {height, RealHeight}, {title, "Arthopods World"}, {map, true} ]),
-    Canvas = gs:create(canvas, Window, [ {x, 0}, {y, 0}, {width, RealWidth}, {height, RealHeight} ]),
-    loop(Canvas).
-
-loop(Canvas) ->
-    receive
-        { make_bug, Pid, Location } ->
-            Maroon = {16#b0, 16#30, 16#60},
-            Pid ! { made_bug, gs:create(rectangle, Canvas, [
-                {coords, bug_rect(Location)},
-                {bw, 1},
-                {fg, Maroon},
-                {fill, Maroon}
-            ]) };
-
-        { move_bug, Pid, Bug, Location } ->
-            gs:config(Bug, [{coords, bug_rect(Location)}]),
-            Pid ! { moved_bug };
-
-        { grow_grass, Pid, Location } ->
-            DarkGreen = {0, 16#64, 0},
-            Pid ! { planted_grass, gs:create(rectangle, Canvas, [
-                {coords, grass_rect(Location)},
-                {bw, 1},
-                {fg, DarkGreen},
-                {fill, DarkGreen}
-            ]) }
-    end,
-    loop(Canvas).
 
 % vim:ts=4:sw=4:et

@@ -33,7 +33,7 @@ move_bug(Bug, Location) ->
     gen_server:call(?MODULE, {move_bug, Bug, Location}).
 
 grow_leaf(Location) ->
-    gen_server:call(?MODULE, {grow_grass, Location}).
+    gen_server:call(?MODULE, {grow_leaf, Location}).
 
 %% gen_server callbacks implementation
 
@@ -59,7 +59,7 @@ handle_call({make_bug, Location}, _From, Canvas) ->
 handle_call({move_bug, Bug, Location}, _From, Canvas) ->
     {reply, gs:config(Bug, [{coords, bug_rect(Location)}]), Canvas};
 
-handle_call({grow_grass, Location}, _From, Canvas) ->
+handle_call({grow_leaf, Location}, _From, Canvas) ->
     {reply, gs:create(rectangle, Canvas, [
         {coords, grass_rect(Location)},
         {bw, 1},

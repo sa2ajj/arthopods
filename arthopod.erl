@@ -41,19 +41,16 @@ give_birth(Kind, World, Energy) ->
 
 % supervisor callback implementation
 init(none) ->
-    {
-        ok,
-        {
-            {simple_one_for_one, 0, 1},
-            [
-                {
-                    spawn_one,  % id -- not used anywhere
-                    {arthopod, spawn_one, []},
-                    temporary, brutal_kill, worker, dynamic
-                }
-            ]
-        }
-    }.
+    { ok, {
+        {simple_one_for_one, 0, 1},
+        [
+            {
+                spawn_one,  % id -- not used anywhere
+                {arthopod, spawn_one, []},
+                temporary, brutal_kill, worker, dynamic
+            }
+        ]
+    }}.
 
 % helper functions
 

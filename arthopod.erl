@@ -13,7 +13,7 @@
 -export([give_birth/3, spawn_one/3]).
 
 % helper functions for our beloved arthopods
--export([move/2, turn/2, random_dir/0]).
+-export([move/2, turn/2, random_dir/0, directions/0]).
 
 % supervisor callbacks
 -export([init/1]).
@@ -71,6 +71,8 @@ spawn_one(Module, World, Energy) ->
     spawn_link(Module, give_birth, [ World, Energy ]).
 
 random_dir() -> select:uniform(?DIRECTIONS).
+
+directions() -> ?DIRECTIONS.
 
 move(Location, Direction) ->
     move(Location, Direction, ?DELTAS).

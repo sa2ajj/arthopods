@@ -1,54 +1,77 @@
 %
 
 -module(world).
+-behaviour(gen_server).
 
 -author("Alexey Vyskubov <alexey@mawhrin.net>").
 -author("Mikhail Sobolev <mss@mawhrin.net>").
 
--export([start/1, world_loop0/2]).
+% inteface definition
+-export([start/1, stop/0]).
 
+% gen_server behaviour callbacks
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
+
+% interface implementation
 start(Size) ->
-    spawn(?MODULE, world_loop0, [ self(), Size ]).
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [self(), Size], []).
 
-world_loop0(Parent, Size) ->
+stop() ->
+    gen_server:cast(?MODULE, {stop, normal}).
+
+% callback implementation
+init([Parent, Size]) ->
     io:format("The world is about to revolve.~n"),
     process_flag(trap_exit, true),          % follow exits of interesting processes
-    link(Parent),
     grass_field:start(lists:max(tuple_to_list(Size))),
     Parent ! { world, self() },
     io:format("We are as big as ~p~n", [Size]),
     Bugs = dict:new(),
-    world_loop(Parent, Size, Bugs).
+    {ok, {Parent, Size, Bugs}}.
 
-world_loop(Parent, Size, Bugs) ->
-    io:format("World: waiting... "),
+terminate(Reason, State) ->
+    io:format("terminate: ~p, ~p~n", [Reason, State]),
+    ok.
 
-    receive
-        { 'EXIT', Parent, _Reason } ->
-            io:format(" exiting...~n"),
-            exit(normal);
+handle_call(Request, From, State) ->
+    io:format("handle_call: ~p, ~p, ~p~n", [Request, From, State]),
+    {noreply, State}.
 
-        { welcome, _ } ->
-            io:format(" welcomed.~n");
+handle_cast({stop, Reason}, State) ->
+    {stop, Reason, State};
 
-        { food, Location } ->
-            io:format(" food (~p)!~n", [Location]),
-            grass_field:grow(Location);
+handle_cast(Request, State) ->
+    io:format("handle_cast: ~p, ~p~n", [Request, State]),
+    {noreply, State}.
 
-        { size, Pid } ->
-            io:format(" size requested from ~p~n", [ Pid ]),
-            Pid ! { size, Size };
 
-        { ack_grow, _Location } ->
-            grass_field:dump();
+handle_info({welcome, _}, State) ->
+    io:format(" welcomed.~n"),
+    {noreply, State};
 
-        ack_dump ->
-            ok;
+handle_info({food, Location}, State) ->
+    io:format(" food (~p)!~n", [Location]),
+    grass_field:grow(Location),
+    {noreply, State};
 
-        Other ->
-            io:format("World got: ~p~n", [ Other ])
-    end,
+handle_info({size, Pid}, {_, Size, _} = State) ->
+    io:format(" size requested from ~p~n", [ Pid ]),
+    Pid ! {size, Size},
+    {noreply, State};
 
-    world_loop(Parent, Size, Bugs).
+handle_info({ack_grow, _Location}, State) ->
+    grass_field:dump(),
+    {noreply, State};
+
+handle_info(ack_dump, State) ->
+    {noreply, State};
+
+handle_info(Info, State) ->
+    io:format("handle_info: ~p, ~p~n", [Info, State]),
+    {noreply, State}.
+
+% not implemented callbacks for gen_server
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
 
 % vim:ts=4:sw=4:et

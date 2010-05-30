@@ -52,6 +52,7 @@ handle_info({welcome, _}, State) ->
 handle_info({food, Location}, State) ->
     io:format(" food (~p)!~n", [Location]),
     grass_field:grow(Location),
+    world_viewer:grow_leaf(Location),
     {noreply, State};
 
 handle_info({size, Pid}, {_, Size, _} = State) ->

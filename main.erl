@@ -7,9 +7,13 @@
 
 -export([start/0]).
 
+-define(WORLD_SIZE, {480, 260}).
+
 start() ->
     io:format("great stuff will be here :)~n"),
-    world:start({480, 260}),
+    Size = ?WORLD_SIZE,
+    world_viewer:start(Size),
+    world:start(Size),
     receive
         { world, World } ->
             io:format("World has been created!~n"),

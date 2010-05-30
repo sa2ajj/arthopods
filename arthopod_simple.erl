@@ -4,8 +4,6 @@
 % behaviour callbacks
 -export([give_birth/2]).
 
--export([life/1]).
-
 % data structures
 -record(simple_bug, {
     world,
@@ -17,7 +15,7 @@
 
 % behaviour callback implementation
 give_birth(World, Energy) ->
-    spawn_link(?MODULE, life, [ #simple_bug{world=World, age=0, energy=Energy} ]).
+    life(#simple_bug{world=World, age=0, energy=Energy}).
 
 life(Bug) ->
     receive

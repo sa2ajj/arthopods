@@ -55,6 +55,6 @@ init(none) ->
 % helper functions
 
 spawn_one(Module, World, Energy) ->
-    Module:give_birth(World, Energy).
+    spawn_link(Module, give_birth, [ World, Energy ]).
 
 % vim:ts=4:sw=4:et

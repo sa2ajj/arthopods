@@ -30,7 +30,7 @@ make_bug(Location) ->
     gen_server:call(?MODULE, {make_bug, Location}).
 
 move_bug(Bug, Location) ->
-    gen_server:call(?MODULE, {move_bug, Bug, Location}).
+    gen_server:cast(?MODULE, {move_bug, Bug, Location}).
 
 grow_leaf(Location) ->
     gen_server:call(?MODULE, {grow_leaf, Location}).
@@ -56,9 +56,6 @@ handle_call({make_bug, Location}, _From, Canvas) ->
         {fill, ?BUG_COLOUR}
     ]), Canvas};
 
-handle_call({move_bug, Bug, Location}, _From, Canvas) ->
-    {reply, gs:config(Bug, [{coords, bug_rect(Location)}]), Canvas};
-
 handle_call({grow_leaf, Location}, _From, Canvas) ->
     {reply, gs:create(rectangle, Canvas, [
         {coords, grass_rect(Location)},
@@ -73,6 +70,10 @@ handle_call(Request, From, Canvas) ->
 
 handle_cast({stop, Reason}, Canvas) ->
     {stop, Reason, Canvas};
+
+handle_cast({move_bug, Bug, Location}, Canvas) ->
+    gs:config(Bug, [{coords, bug_rect(Location)}]),
+    {noreply, Canvas};
 
 handle_cast(Request, Canvas) ->
     io:format("handle_cast: ~p, ~p~n", [Request, Canvas]),

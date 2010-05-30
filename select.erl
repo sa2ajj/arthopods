@@ -17,7 +17,7 @@ uniform(Tuple) when is_tuple(Tuple) ->
 quadratic(List) ->
     { Total, Bounds } = calculate(List, 0, []),
     Number = random:uniform(Total),
-    io:format("total: ~p, bounds: ~p, number: ~p~n", [ Total, Bounds, Number ]),
+    % io:format("total: ~p, bounds: ~p, number: ~p~n", [ Total, Bounds, Number ]),
     quadratic(Bounds, Number).
 
 calculate([], Total, Bounds) ->

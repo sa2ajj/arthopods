@@ -13,7 +13,7 @@
 -define(GRAS_COLOUR, {0, 16#64, 0}).
 
 %% server interface
--export([start/1, stop/0, make_bug/1, move_bug/2, kill_bug/1, grow_leaf/1]).
+-export([start/1, stop/0, make_bug/1, move_bug/2, kill_bug/1, grow_leaf/1, cut_leaf/1]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
@@ -37,6 +37,9 @@ kill_bug(Bug) ->
 
 grow_leaf(Location) ->
     gen_server:call(?MODULE, {grow_leaf, Location}).
+
+cut_leaf(Leaf) ->
+    gen_server:cast(?MODULE, {cut_leaf, Leaf}).
 
 %% gen_server callbacks implementation
 
@@ -80,6 +83,10 @@ handle_cast({move_bug, Bug, Location}, Canvas) ->
 
 handle_cast({kill_bug, Bug}, Canvas) ->
     gs:destroy(Bug),
+    {noreply, Canvas};
+
+handle_cast({cut_leaf, Leaf}, Canvas) ->
+    gs:destroy(Leaf),
     {noreply, Canvas};
 
 handle_cast(Request, Canvas) ->

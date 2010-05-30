@@ -4,7 +4,7 @@ BEAMS = $(SOURCES:.erl=.beam)
 .SUFFIXES: .erl .beam
 
 .erl.beam:
-	erlc -Werror $<
+	erlc -pa . -Werror $<
 
 all: $(BEAMS)
 

@@ -13,16 +13,15 @@ start() ->
     io:format("great stuff will be here :)~n"),
     Size = ?WORLD_SIZE,
     world_viewer:start(Size),
-    world:start(Size),
-    receive
-        { world, World } ->
-            io:format("World has been created!~n"),
+    case world:start(Size) of
+        {ok, World} ->
+            io:format("World has been created (~p)~n", [World]),
             World ! { welcome, "Thank you for being there" },
             food_generator:start(World, 2000),      % generate a piece of food every 2 secs
             populate_world(World),
             loop();
-
-        Other -> io:format("Got: ~w~n", Other)
+        Other ->
+            io:format("Failed to create the world: ~p~n", [Other])
     end.
 
 populate_world(_World) ->

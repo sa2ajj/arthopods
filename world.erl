@@ -7,7 +7,7 @@
 -author("Mikhail Sobolev <mss@mawhrin.net>").
 
 % inteface definition
--export([start/1, stop/0]).
+-export([start/1, stop/0, cast/1, call/1]).
 
 % gen_server behaviour callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
@@ -18,6 +18,12 @@ start(Size) ->
 
 stop() ->
     gen_server:cast(?MODULE, {stop, normal}).
+
+cast(Request) ->
+    gen_server:cast(?MODULE, Request).
+
+call(Request) ->
+    gen_server:call(?MODULE, Request).
 
 % callback implementation
 init([Parent, Size]) ->

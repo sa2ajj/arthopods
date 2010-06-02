@@ -12,7 +12,7 @@ uniform(Tuple) when is_tuple(Tuple) ->
     element(random:uniform(tuple_size(Tuple)), Tuple).
 
 % gets a list of tuples {Tag, Weight}
-% returns a Tag[i] with probability Weight[i]/sum(Weight[i]^2)
+% returns a Tag[i] with probability Weight[i]^2/sum(Weight[i]^2)
 
 quadratic(List) ->
     { Total, Bounds } = calculate(List, 0, []),

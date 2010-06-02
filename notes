@@ -1,0 +1,11 @@
+
+Coordinates
+-----------
+
+world space --> {0, 0} - {Width, Height}
+
+diameter = bug maxsize div 2
+
+canvas -> {0, 0} -> {Width + 2*diameter, Height + 2*diameter}
+
+{CanvasX, CanvasY} = {WorldX + diameter, WorldY + diameter}

@@ -1,17 +1,10 @@
 -module(arthopod_simple).
 -behaviour(arthopod).
 
+-include("arthopod.hrl").
+
 % behaviour callbacks
 -export([give_birth/2]).
-
-% data structures
--record(simple_bug, {
-    world,
-    age,
-    energy,
-    direction,
-    genes
-}).
 
 % behaviour callback implementation
 give_birth(World, Energy) ->

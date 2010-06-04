@@ -6,6 +6,8 @@
 -author("Alexey Vyskubov <alexey@mawhrin.net>").
 -author("Mikhail Sobolev <mss@mawhrin.net>").
 
+-include("arthopod.hrl").
+
 % interface description
 -export([start_link/0]).
 -export([behaviour_info/1]).

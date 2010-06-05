@@ -22,7 +22,7 @@ life(#simple_bug{energy=Energy}) when Energy == 0 ->
 
 life(#simple_bug{age=Age, energy=Energy, direction=Direction, genes=Genes} = Bug) ->
     io:format("Bug: ~p~n", [Bug]),
-    utils:sleep(100),
+    timer:sleep(100),
 %    receive
 %    after 0 ->
 %        ok

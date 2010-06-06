@@ -32,8 +32,9 @@ init([Parent, Size]) ->
     grass_field:start(lists:max(tuple_to_list(Size))),
     Parent ! { world, self() },
     io:format("We are as big as ~p~n", [Size]),
-    Bugs = dict:new(),
-    {ok, {Parent, Size, Bugs}}.
+    Bugs = dict:new(),      % Pid -> {GsObject, Location}
+    Grass = dict:new(),     % Location -> GsObject
+    {ok, {Parent, Size, Bugs, Grass}}.
 
 terminate(Reason, State) ->
     io:format("terminate: ~p, ~p~n", [Reason, State]),
@@ -55,13 +56,22 @@ handle_info({welcome, _}, State) ->
     io:format(" welcomed.~n"),
     {noreply, State};
 
-handle_info({food, Location}, State) ->
+handle_info({food, Location}, {Parent, Size, Bugs, Grass}) ->
     io:format(" food (~p)!~n", [Location]),
-    grass_field:grow(Location),
-    world_viewer:grow_leaf(Location),
-    {noreply, State};
+    NewGrass = case dict:find(Location, Grass) of
+        {ok, _} ->
+            io:format("We already have one at ~p~n", [Location]),
+            Grass;
 
-handle_info({size, Pid}, {_, Size, _} = State) ->
+        error ->
+            grass_field:grow(Location),
+            Leaf = world_viewer:grow_leaf(Location),
+            dict:store(Location, Leaf, Grass)
+    end,
+
+    {noreply, {Parent, Size, Bugs, NewGrass}};
+
+handle_info({size, Pid}, {_, Size, _, _} = State) ->
     io:format(" size requested from ~p~n", [ Pid ]),
     Pid ! {size, Size},
     {noreply, State};

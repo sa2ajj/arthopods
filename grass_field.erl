@@ -45,7 +45,7 @@ terminate(_Reason, _Field) ->
 
 handle_call(Request, From, State) ->
     io:format("handle_call: ~p, ~p, ~p~n", [Request, From, State]),
-    {noreply, State}.
+    {reply, ok, State}.
 
 handle_cast({stop, Reason}, State) ->
     {stop, Reason, State};

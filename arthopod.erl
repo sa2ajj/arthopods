@@ -15,7 +15,7 @@
 -export([give_birth/3, spawn_one/3]).
 
 % helper functions for our beloved arthopods
--export([move/2, turn/2, random_dir/0, directions/0]).
+-export([move/2, turn/2, random_dir/0]).
 
 % supervisor callbacks
 -export([init/1]).
@@ -31,13 +31,14 @@
     {strong_left, {-1, -1}},
     {left, {-1, 1}}
 ]).
+-define(MAX_GENE_VALUE, 10).
 
 % interface implementation
 start_link() ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, none).
 
 behaviour_info(callbacks) ->
-    [{give_birth, 2}];
+    [{give_birth, 4}];
 
 behaviour_info(_Other) ->
     undefined.
@@ -68,13 +69,10 @@ init(none) ->
     }}.
 
 % helper functions
-
 spawn_one(Module, World, Energy) ->
-    spawn_link(Module, give_birth, [ World, Energy ]).
+    spawn_link(Module, give_birth, [World, Energy, arthopod:random_dir(), make_genes(?DIRECTIONS, ?MAX_GENE_VALUE)]).
 
 random_dir() -> select:uniform(?DIRECTIONS).
-
-directions() -> ?DIRECTIONS.
 
 move(Location, Direction) ->
     move(Location, Direction, ?DELTAS).
@@ -90,5 +88,16 @@ turn(Direction, Turn, Directions) ->
     DirectionValue = utils:index(Direction, Directions)-1,
     TurnValue = utils:index(Turn, Directions)-1,
     lists:nth(((DirectionValue+TurnValue) rem length(Directions))+1, Directions).
+
+make_genes(GeneTags, MaxValue) ->
+    make_genes(GeneTags, MaxValue, []).
+
+make_genes([], _, Result) ->
+    Result;
+
+make_genes([ GeneTag | Tail ], MaxValue, Result) ->
+    make_genes(Tail, MaxValue, [{GeneTag, random:uniform(MaxValue)} | Result]).
+
+
 
 % vim:ts=4:sw=4:et

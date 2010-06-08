@@ -9,3 +9,24 @@ diameter = bug maxsize div 2
 canvas -> {0, 0} -> {Width + 2*diameter, Height + 2*diameter}
 
 {CanvasX, CanvasY} = {WorldX + diameter, WorldY + diameter}
+
+Objects
+-------
+
+World <--> Body <--> Brain
+
+World
+    Keeps track of objects
+    Handles moves
+    Provides information about the environment (e.g. do we have food around?)
+
+Body
+    Implements "parameters" of the species
+    Holds genes
+    Handles interaction with the environment (turns, moves, eating, etc)
+    Keeps track of energy
+
+Brain
+    does the job! :)
+    decides what to do next
+    keeps the body busy

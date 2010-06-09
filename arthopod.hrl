@@ -1,6 +1,6 @@
 % data structure
 -record(simple_bug, {
-    world,
+    body,
     age,
     energy,
     direction,

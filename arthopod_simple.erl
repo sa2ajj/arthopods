@@ -10,10 +10,10 @@
 -export([give_birth/4]).
 
 % behaviour callback implementation
-give_birth(World, Energy, Direction, Genes) ->
+give_birth(Body, Energy, Direction, Genes) ->
     process_flag(trap_exit, true),
     life(#simple_bug{
-            world=World,
+            body=Body,
             age=0,          % new born :)
             energy=Energy,
             direction=Direction,

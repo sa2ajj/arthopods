@@ -1,6 +1,9 @@
 -module(arthopod_simple).
 -behaviour(arthopod).
 
+-author("Alexey Vyskubov <alexey@mawhrin.net>").
+-author("Mikhail Sobolev <mss@mawhrin.net>").
+
 -include("arthopod.hrl").
 
 % behaviour callbacks

@@ -14,7 +14,6 @@ give_birth(Body, Energy, Direction, Genes) ->
     process_flag(trap_exit, true),
     life(#simple_bug{
             body=Body,
-            age=0,          % new born :)
             energy=Energy,
             direction=Direction,
             genes=Genes
@@ -24,7 +23,7 @@ give_birth(Body, Energy, Direction, Genes) ->
 life(#simple_bug{energy=Energy}) when Energy == 0 ->
     ok;
 
-life(#simple_bug{age=Age, energy=Energy, direction=Direction, genes=Genes} = Bug) ->
+life(#simple_bug{energy=Energy, direction=Direction, genes=Genes} = Bug) ->
     io:format("Bug: ~p~n", [Bug]),
     timer:sleep(100),
 %    receive
@@ -32,6 +31,6 @@ life(#simple_bug{age=Age, energy=Energy, direction=Direction, genes=Genes} = Bug
 %        ok
 %    end,
     NewDirection = arthopod:turn(Direction, select:quadratic(Genes)),
-    life(Bug#simple_bug{age=Age+1, energy=Energy-1, direction=NewDirection}).
+    life(Bug#simple_bug{energy=Energy-1, direction=NewDirection}).
 
 % vim:ts=4:sw=4:et

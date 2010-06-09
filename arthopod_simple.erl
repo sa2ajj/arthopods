@@ -11,6 +11,7 @@
 
 % behaviour callback implementation
 give_birth(World, Energy, Direction, Genes) ->
+    process_flag(trap_exit, true),
     life(#simple_bug{
             world=World,
             age=0,          % new born :)

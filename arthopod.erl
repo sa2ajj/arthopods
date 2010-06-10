@@ -36,7 +36,7 @@
 
 %% {{{ behaviour description
 behaviour_info(callbacks) ->
-    [{give_birth, 4}];
+    [{give_birth, 3}];
 
 behaviour_info(_Other) ->
     undefined.
@@ -65,7 +65,7 @@ give_birth(Kind, World, Energy) ->
 init([Module, World, Energy] = Args) ->
     io:format("init: ~p~n", [Args]),
     Genes = make_genes(),
-    Brain = spawn_link(Module, give_birth, [self(), Energy, arthopod:random_dir(), Genes]),
+    Brain = spawn_link(Module, give_birth, [self(), arthopod:random_dir(), Genes]),
     io:format(" brain @ ~p~n", [Brain]),
     {ok, {Module, World, Energy, Brain, Genes}}.
 

@@ -7,23 +7,19 @@
 -include("arthopod.hrl").
 
 % behaviour callbacks
--export([give_birth/4]).
+-export([give_birth/3]).
 
 % behaviour callback implementation
-give_birth(Body, Energy, Direction, Genes) ->
+give_birth(Body, Direction, Genes) ->
     process_flag(trap_exit, true),
     life(#simple_bug{
             body=Body,
-            energy=Energy,
             direction=Direction,
             genes=Genes
     }).
 
 % the actual worker
-life(#simple_bug{energy=Energy}) when Energy == 0 ->
-    ok;
-
-life(#simple_bug{energy=Energy, direction=Direction, genes=Genes} = Bug) ->
+life(#simple_bug{direction=Direction, genes=Genes} = Bug) ->
     io:format("Bug: ~p~n", [Bug]),
     timer:sleep(100),
 %    receive
@@ -31,6 +27,6 @@ life(#simple_bug{energy=Energy, direction=Direction, genes=Genes} = Bug) ->
 %        ok
 %    end,
     NewDirection = arthopod:turn(Direction, select:quadratic(Genes)),
-    life(Bug#simple_bug{energy=Energy-1, direction=NewDirection}).
+    life(Bug#simple_bug{direction=NewDirection}).
 
 % vim:ts=4:sw=4:et

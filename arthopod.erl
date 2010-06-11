@@ -46,9 +46,6 @@ give_birth(Kind, World, Energy) ->
     Result = supervisor:start_child(arthopod_sup, [list_to_atom(?PREFIX++atom_to_list(Kind)), World, Energy]),
     io:format("give_birth: ~p (~p)~n", [Result, is_pid(Result)]),
     case Result of
-        Pid when is_pid(Pid) ->
-            {ok, Pid};
-
         {ok, Pid} when is_pid(Pid) ->
             {ok, Pid};
 

@@ -12,6 +12,14 @@
 % gen_server behaviour callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
+% definitions
+-record(world_state, {
+    parent,
+    size,
+    bugs,
+    grass
+}).
+
 % interface implementation
 start(Size) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [self(), Size], []).
@@ -34,7 +42,7 @@ init([Parent, Size]) ->
     io:format("We are as big as ~p~n", [Size]),
     Bugs = dict:new(),      % Pid -> {GsObject, Location}
     Grass = dict:new(),     % Location -> GsObject
-    {ok, {Parent, Size, Bugs, Grass}}.
+    {ok, #world_state{parent=Parent, size=Size, bugs=Bugs, grass=Grass}}.
 
 terminate(Reason, State) ->
     io:format("terminate: ~p, ~p~n", [Reason, State]),

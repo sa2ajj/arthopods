@@ -48,6 +48,18 @@ terminate(Reason, State) ->
     io:format("terminate: ~p, ~p~n", [Reason, State]),
     ok.
 
+handle_call({move, Body, {DX, DY}}, _From, #world_state{size={Width, Height}, bugs=Bugs} = State) ->
+    {Reply, NewBugs} = case dict:find(Body, Bugs) of
+        {ok, {BodyObject, {X, Y}}} ->
+            NewLocation = {(X+DX+Width) rem Width, (Y+DY+Height) rem Height},
+            world_viewer:move_bug(BodyObject, NewLocation),
+            {ok, dict:store(Body, {BodyObject, NewLocation}, Bugs)};
+
+        error ->
+            {error, Bugs}
+    end,
+    {reply, Reply, State#world_state{bugs=NewBugs}};
+
 handle_call(Request, From, State) ->
     io:format("handle_call: ~p, ~p, ~p~n", [Request, From, State]),
     {noreply, State}.

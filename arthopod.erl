@@ -49,7 +49,7 @@ subspecies_module(Kind) ->
     list_to_atom(?PREFIX++atom_to_list(Kind)).
 
 give_birth(Kind, Energy) ->
-    case supervisor:start_child(arthopod_sup, [subspecies_module(Kind), Energy]) of
+    case supervisor:start_child(arthopod_sup, [Kind, Energy]) of
         {ok, Pid} when is_pid(Pid) ->
             {ok, Pid};
 
@@ -61,7 +61,7 @@ give_birth(Kind, Energy) ->
     end.
 
 give_birth(Kind, Energy, Genes) ->
-    case supervisor:start_child(arthopod_sup, [subspecies_module(Kind), Energy, Genes]) of
+    case supervisor:start_child(arthopod_sup, [Kind, Energy, Genes]) of
         {ok, Pid} when is_pid(Pid) ->
             {ok, Pid};
 
@@ -75,21 +75,23 @@ give_birth(Kind, Energy, Genes) ->
 %% {{{ CALLBACK IMPLEMENTATION
 
 % constructor
-init([Module, Energy] = Args) ->
+init([Kind, Energy] = Args) ->
     io:format("init: ~p~n", [Args]),
+    Module = subspecies_module(Kind),
     Genes = make_genes(),
     {ok, #arthopod_body{
-        subspecies=Module,
+        subspecies=Kind,
         energy=Energy,
         brain=spawn_link(Module, give_birth, [self(), Genes]),
         genes=Genes,
         direction=random_dir()
     }};
 
-init([Module, Energy, Genes] = Args) ->
+init([Kind, Energy, Genes] = Args) ->
     io:format("init: ~p~n", [Args]),
+    Module = subspecies_module(Kind),
     {ok, #arthopod_body{
-        subspecies=Module,
+        subspecies=Kind,
         energy=Energy,
         brain=spawn_link(Module, give_birth, [self(), Genes]),
         genes=Genes,
@@ -137,11 +139,11 @@ code_change(_OldVsn, Body, _Extra) ->
 %% }}}
 
 %% HELPER FUNCTIONS
-spawn_one(Module, Energy) ->
-    gen_server:start_link(?MODULE, [Module, Energy], []).
+spawn_one(Kind, Energy) ->
+    gen_server:start_link(?MODULE, [Kind, Energy], []).
 
-spawn_one(Module, Energy, Genes) ->
-    gen_server:start_link(?MODULE, [Module, Energy, Genes], []).
+spawn_one(Kind, Energy, Genes) ->
+    gen_server:start_link(?MODULE, [Kind, Energy, Genes], []).
 
 random_dir() -> select:uniform(?DIRECTIONS).
 

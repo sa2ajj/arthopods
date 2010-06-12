@@ -102,12 +102,11 @@ handle_call(turn, _From, #arthopod_body{direction=Direction, genes=Genes} = Body
 handle_call(move, _From, #arthopod_body{direction=Direction} = Body) ->
     case world:move(self(), lists:keyfind(Direction, 1, ?DELTAS)) of
         ok ->
-            ok;
+            {reply, ok, Body};
 
         error ->
-            exit(normal)    % world does not know us? commit suicide!
-    end,
-    {reply, ok, Body};
+            {stop, no_energy, Body}     % world does not know us? commit suicide!
+    end;
 
 handle_call(Request, From, Body) ->
     io:format("handle_call: ~p, ~p, ~p~n", [Request, From, Body]),

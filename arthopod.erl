@@ -77,15 +77,7 @@ give_birth(Kind, Energy, Genes) ->
 % constructor
 init([Kind, Energy] = Args) ->
     io:format("init: ~p~n", [Args]),
-    Module = subspecies_module(Kind),
-    Genes = make_genes(),
-    {ok, #arthopod_body{
-        subspecies=Kind,
-        energy=Energy,
-        brain=spawn_link(Module, give_birth, [self(), Genes]),
-        genes=Genes,
-        direction=random_dir()
-    }};
+    init([Kind, Energy, make_genes()]);
 
 init([Kind, Energy, Genes] = Args) ->
     io:format("init: ~p~n", [Args]),

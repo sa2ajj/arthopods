@@ -10,7 +10,7 @@
 -export([behaviour_info/1]).
 
 % API export
--export([give_birth/2, spawn_one/2]).
+-export([give_birth/2, give_birth/3, spawn_one/2, spawn_one/3]).
 -export([move/1, turn/1]).
 
 % gen_server callbacks
@@ -45,10 +45,23 @@ behaviour_info(_Other) ->
     undefined.
 %% }}}
 
+subspecies_module(Kind) ->
+    list_to_atom(?PREFIX++atom_to_list(Kind)).
+
 give_birth(Kind, Energy) ->
-    Result = supervisor:start_child(arthopod_sup, [list_to_atom(?PREFIX++atom_to_list(Kind)), Energy]),
-    io:format("give_birth: ~p (~p)~n", [Result, is_pid(Result)]),
-    case Result of
+    case supervisor:start_child(arthopod_sup, [subspecies_module(Kind), Energy]) of
+        {ok, Pid} when is_pid(Pid) ->
+            {ok, Pid};
+
+        {error, Error} ->
+            {error, Error};
+
+        Other ->
+            {error, Other}
+    end.
+
+give_birth(Kind, Energy, Genes) ->
+    case supervisor:start_child(arthopod_sup, [subspecies_module(Kind), Energy, Genes]) of
         {ok, Pid} when is_pid(Pid) ->
             {ok, Pid};
 
@@ -65,6 +78,16 @@ give_birth(Kind, Energy) ->
 init([Module, Energy] = Args) ->
     io:format("init: ~p~n", [Args]),
     Genes = make_genes(),
+    {ok, #arthopod_body{
+        subspecies=Module,
+        energy=Energy,
+        brain=spawn_link(Module, give_birth, [self(), Genes]),
+        genes=Genes,
+        direction=random_dir()
+    }};
+
+init([Module, Energy, Genes] = Args) ->
+    io:format("init: ~p~n", [Args]),
     {ok, #arthopod_body{
         subspecies=Module,
         energy=Energy,
@@ -116,6 +139,9 @@ code_change(_OldVsn, Body, _Extra) ->
 %% HELPER FUNCTIONS
 spawn_one(Module, Energy) ->
     gen_server:start_link(?MODULE, [Module, Energy], []).
+
+spawn_one(Module, Energy, Genes) ->
+    gen_server:start_link(?MODULE, [Module, Energy, Genes], []).
 
 random_dir() -> select:uniform(?DIRECTIONS).
 

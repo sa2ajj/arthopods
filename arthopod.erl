@@ -35,6 +35,8 @@
     {left, {-1, 1}}
 ]).
 -define(MAX_GENE_VALUE, 10).
+-define(TURN_COST, 1).
+-define(MOVE_COST, 2).
 %% }}}
 
 %% {{{ behaviour description
@@ -95,14 +97,20 @@ terminate(Reason, State) ->
     io:format("terminate: ~p, ~p~n", [Reason, State]),
     ok.
 
+handle_call(turn, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?TURN_COST ->
+    {stop, no_energy, Body};
+
 handle_call(turn, _From, #arthopod_body{direction=Direction, genes=Genes} = Body) ->
     NewDirection = turn(Direction, select:quadratic(Genes)),
     {reply, ok, Body#arthopod_body{direction=NewDirection}};
 
-handle_call(move, _From, #arthopod_body{direction=Direction} = Body) ->
+handle_call(move, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?MOVE_COST ->
+    {stop, no_energy, Body};
+
+handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction} = Body) ->
     case world:move(self(), lists:keyfind(Direction, 1, ?DELTAS)) of
         ok ->
-            {reply, ok, Body};
+            {reply, ok, Body#arthopod_body{energy=Energy-?MOVE_COST}};
 
         error ->
             {stop, no_energy, Body}     % world does not know us? commit suicide!

@@ -108,22 +108,20 @@ handle_info({welcome, _}, State) ->
     io:format(" welcomed.~n"),
     {noreply, State};
 
-handle_info({food, Location}, {Parent, Size, Bugs, Grass}) ->
+handle_info({food, Location}, #world_state{grass=Grass} = State) ->
     io:format(" food (~p)!~n", [Location]),
-    NewGrass = case dict:find(Location, Grass) of
+    case dict:find(Location, Grass) of
         {ok, _} ->
             io:format("We already have one at ~p~n", [Location]),
-            Grass;
+            {noreply, State};
 
         error ->
             grass_field:grow(Location),
             Leaf = world_viewer:grow_leaf(Location),
-            dict:store(Location, Leaf, Grass)
-    end,
+            {noreply, State#world_state{grass=dict:store(Location, Leaf, Grass)}}
+    end;
 
-    {noreply, {Parent, Size, Bugs, NewGrass}};
-
-handle_info({size, Pid}, {_, Size, _, _} = State) ->
+handle_info({size, Pid}, #world_state{size=Size} = State) ->
     io:format(" size requested from ~p~n", [ Pid ]),
     Pid ! {size, Size},
     {noreply, State};

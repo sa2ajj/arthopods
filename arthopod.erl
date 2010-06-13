@@ -94,7 +94,7 @@ terminate(Reason, Body) ->
     world:die(self()).
 
 handle_call(turn, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?TURN_COST ->
-    {stop, no_energy, Body};
+    {stop, normal, no_energy, Body};
 
 handle_call(turn, _From, #arthopod_body{direction=Direction, energy=Energy, genes=Genes} = Body) ->
     NewDirection = turn(Direction, select:quadratic(Genes)),
@@ -102,12 +102,12 @@ handle_call(turn, _From, #arthopod_body{direction=Direction, energy=Energy, gene
     {reply, ok, Body#arthopod_body{direction=NewDirection, energy=Energy-?TURN_COST}};
 
 handle_call(move, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?MOVE_COST ->
-    {stop, no_energy, Body};
+    {stop, normal, no_energy, Body};
 
 handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction} = Body) ->
     case lists:keyfind(Direction, 1, ?DELTAS) of
         false ->
-            {stop, unknown_direction, Body};
+            {stop, normal, unknown_direction, Body};
 
         {Direction, Delta} ->
             case world:move(self(), Delta) of
@@ -116,7 +116,7 @@ handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction} = Bo
                     {reply, ok, Body#arthopod_body{energy=Energy-?MOVE_COST}};
 
                 error ->
-                    {stop, not_known_to_world, Body}     % world does not know us? commit suicide!
+                    {stop, normal, not_known_to_world, Body}    % world does not know us? commit suicide!
             end
     end;
 

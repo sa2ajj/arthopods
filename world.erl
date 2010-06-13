@@ -68,8 +68,8 @@ handle_call({move, Body, {DX, DY}}, _From, #world_state{size={Width, Height}, bu
     end,
     {reply, Reply, State#world_state{bugs=NewBugs}};
 
-handle_call({give_birth, Species, [Kind, Parameters]}, _From, #world_state{size={Width, Height}, bugs=Bugs} = State) ->
-    case Species:give_birth(Kind, Parameters) of
+handle_call({give_birth, Species, Parameters}, _From, #world_state{size={Width, Height}, bugs=Bugs} = State) ->
+    case apply(Species, give_birth, Parameters) of
         {ok, BugBody} ->
             Location = {random:uniform(Width)-1, random:uniform(Height)-1},
             BodyObject = world_viewer:make_bug(Location),

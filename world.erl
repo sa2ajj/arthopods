@@ -73,7 +73,7 @@ handle_call({give_birth, Species, Parameters}, _From, #world_state{size={Width, 
         {ok, BugBody} ->
             Location = {random:uniform(Width)-1, random:uniform(Height)-1},
             BodyObject = world_viewer:make_bug(Location),
-            {ok, State#world_state{bugs=dict:store(BugBody, {BodyObject, Location}, Bugs)}};
+            {reply, ok, State#world_state{bugs=dict:store(BugBody, {BodyObject, Location}, Bugs)}};
 
         {error, _Error} ->
             {reply, ok, State}

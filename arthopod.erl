@@ -149,15 +149,6 @@ turn(Direction, Turn, Directions) ->
     lists:nth(((DirectionValue+TurnValue) rem length(Directions))+1, Directions).
 
 make_genes() ->
-    make_genes(?DIRECTIONS, ?MAX_GENE_VALUE).
-
-make_genes(GeneTags, MaxValue) ->
-    make_genes(GeneTags, MaxValue, []).
-
-make_genes([], _, Result) ->
-    Result;
-
-make_genes([ GeneTag | Tail ], MaxValue, Result) ->
-    make_genes(Tail, MaxValue, [{GeneTag, random:uniform(MaxValue)} | Result]).
+    [ {Gene, random:uniform(?MAX_GENE_VALUE)} || Gene <- ?DIRECTIONS ].
 
 % vim:ts=4:sw=4:et

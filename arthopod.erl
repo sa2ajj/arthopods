@@ -107,7 +107,7 @@ handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction} = Bo
             {reply, ok, Body#arthopod_body{energy=Energy-?MOVE_COST}};
 
         error ->
-            {stop, no_energy, Body}     % world does not know us? commit suicide!
+            {stop, not_known_to_world, Body}     % world does not know us? commit suicide!
     end;
 
 handle_call(Request, From, Body) ->

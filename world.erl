@@ -85,12 +85,11 @@ handle_call(Request, From, State) ->
     {noreply, State}.
 
 handle_cast({die, Body}, #world_state{bugs=Bugs} = State) ->
-    case dict:find(Body, Bugs) of
-        {ok, {BodyObject, _Location}} ->
-            world_viewer:kill_bug(BodyObject),
-            {noreply, State#world_state{bugs=dict:erase(Body, Bugs)}};
+    case die(Body, Bugs) of
+        {ok, NewBugs} ->
+            {noreply, State#world_state{bugs=NewBugs}};
 
-        error ->
+        {error, _} ->
             {noreply, State}
     end;
 
@@ -148,6 +147,16 @@ give_birth(Species, Parameters, Location, Bugs) ->
             {ok, dict:store(BugBody, {BodyObject, Location}, Bugs)};
 
         {error, _Error} ->
+            {error, Bugs}
+    end.
+
+die(Body, Bugs) ->
+    case dict:find(Body, Bugs) of
+        {ok, {BodyObject, _Location}} ->
+            world_viewer:kill_bug(BodyObject),
+            {ok, dict:erase(Body, Bugs)};
+
+        error ->
             {error, Bugs}
     end.
 

@@ -37,7 +37,9 @@
 -define(MAX_GENE_VALUE, 10).
 -define(ARTHOPOD_DEFAULT_ENERGY, 200).
 -define(TURN_COST, 1).
+-define(TURN_TIME, 20).
 -define(MOVE_COST, 2).
+-define(MOVE_TIME, 100).
 %% }}}
 
 %% {{{ behaviour description
@@ -96,6 +98,7 @@ handle_call(turn, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?TU
 
 handle_call(turn, _From, #arthopod_body{direction=Direction, energy=Energy, genes=Genes} = Body) ->
     NewDirection = turn(Direction, select:quadratic(Genes)),
+    timer:sleep(?TURN_TIME),
     {reply, ok, Body#arthopod_body{direction=NewDirection, energy=Energy-?TURN_COST}};
 
 handle_call(move, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?MOVE_COST ->
@@ -104,6 +107,7 @@ handle_call(move, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?MO
 handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction} = Body) ->
     case world:move(self(), lists:keyfind(Direction, 1, ?DELTAS)) of
         ok ->
+            timer:sleep(?MOVE_TIME),
             {reply, ok, Body#arthopod_body{energy=Energy-?MOVE_COST}};
 
         error ->

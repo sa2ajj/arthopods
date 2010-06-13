@@ -124,7 +124,7 @@ handle_info({size, Pid}, #world_state{size=Size} = State) ->
     {noreply, State};
 
 handle_info({ack_grow, _Location}, State) ->
-    grass_field:dump(),
+    % grass_field:dump(),
     {noreply, State};
 
 handle_info(ack_dump, State) ->

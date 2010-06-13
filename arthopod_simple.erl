@@ -15,7 +15,6 @@ give_birth(Body, Genes) ->
 % the actual worker
 life(Body, Genes) ->
     io:format("Bug: ~p~n", [[Body, Genes]]),
-    timer:sleep(100),
     arthopod:turn(Body),
     life(Body, Genes).
 

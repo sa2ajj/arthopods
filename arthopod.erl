@@ -10,7 +10,7 @@
 -export([behaviour_info/1]).
 
 % API export
--export([give_birth/1, give_birth/2, give_birth/3, spawn_one/2, spawn_one/3]).
+-export([give_birth/1, give_birth/2, give_birth/3, spawn_one/3]).
 -export([move/1, turn/1]).
 
 % gen_server callbacks
@@ -72,10 +72,6 @@ give_birth(Kind, Energy, Genes) ->
 %% {{{ CALLBACK IMPLEMENTATION
 
 % constructor
-init([Kind, Energy] = Args) ->
-    io:format("init: ~p~n", [Args]),
-    init([Kind, Energy, make_genes()]);
-
 init([Kind, Energy, Genes] = Args) ->
     io:format("init: ~p~n", [Args]),
     Module = subspecies_module(Kind),
@@ -133,9 +129,6 @@ code_change(_OldVsn, Body, _Extra) ->
 %% }}}
 
 %% HELPER FUNCTIONS
-spawn_one(Kind, Energy) ->
-    gen_server:start_link(?MODULE, [Kind, Energy], []).
-
 spawn_one(Kind, Energy, Genes) ->
     gen_server:start_link(?MODULE, [Kind, Energy, Genes], []).
 

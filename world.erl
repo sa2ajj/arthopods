@@ -72,11 +72,9 @@ handle_call({move, Body, {DX, DY}}, _From, #world_state{size={Width, Height}, bu
     {reply, Reply, State#world_state{bugs=NewBugs}};
 
 handle_call({give_birth, Species, Parameters}, _From, #world_state{size={Width, Height}, bugs=Bugs} = State) ->
-    case apply(Species, give_birth, Parameters) of
-        {ok, BugBody} ->
-            Location = {random:uniform(Width)-1, random:uniform(Height)-1},
-            BodyObject = world_viewer:make_bug(Location),
-            {reply, ok, State#world_state{bugs=dict:store(BugBody, {BodyObject, Location}, Bugs)}};
+    case give_birth(Species, Parameters, {random:uniform(Width)-1, random:uniform(Height)-1}, Bugs) of
+        {ok, NewBugs} ->
+            {reply, ok, State#world_state{bugs=NewBugs}};
 
         {error, _Error} ->
             {reply, ok, State}
@@ -140,5 +138,19 @@ handle_info(Info, State) ->
 % not implemented callbacks for gen_server
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
+
+%% {{{ HELPER FUNCTIONS
+
+give_birth(Species, Parameters, Location, Bugs) ->
+    case apply(Species, give_birth, Parameters) of
+        {ok, BugBody} ->
+            BodyObject = world_viewer:make_bug(Location),
+            {ok, dict:store(BugBody, {BodyObject, Location}, Bugs)};
+
+        {error, _Error} ->
+            {error, Bugs}
+    end.
+
+%% }}}
 
 % vim:ts=4:sw=4:et

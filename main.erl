@@ -7,7 +7,7 @@
 
 -export([start/0]).
 
--define(WORLD_SIZE, {480, 260}).
+-define(WORLD_SIZE, {700, 400}).
 
 start() ->
     io:format("great stuff will be here :)~n"),

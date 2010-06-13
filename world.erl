@@ -8,7 +8,7 @@
 
 % inteface definition
 -export([start/1, stop/0, cast/1, call/1]).
--export([give_birth/2, move/2]).
+-export([give_birth/2, die/1, move/2]).
 
 % gen_server behaviour callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
@@ -37,6 +37,9 @@ call(Request) ->
 
 give_birth(Species, Parameters) ->
     gen_server:call(?MODULE, {give_birth, Species, Parameters}).
+
+die(Body) ->
+    gen_server:cast(?MODULE, {die, Body}).
 
 move(Body, Delta) ->
     gen_server:call(?MODULE, {move, Body, Delta}).
@@ -82,6 +85,16 @@ handle_call({give_birth, Species, Parameters}, _From, #world_state{size={Width, 
 handle_call(Request, From, State) ->
     io:format("handle_call: ~p, ~p, ~p~n", [Request, From, State]),
     {noreply, State}.
+
+handle_cast({die, Body}, #world_state{bugs=Bugs} = State) ->
+    case dict:find(Body, Bugs) of
+        {ok, {BodyObject, _Location}} ->
+            world_viewer:kill_bug(BodyObject),
+            {noreply, State#world_state{bugs=dict:erase(Body, Bugs)}};
+
+        error ->
+            {noreply, State}
+    end;
 
 handle_cast({stop, Reason}, State) ->
     {stop, Reason, State};

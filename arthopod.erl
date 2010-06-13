@@ -89,9 +89,9 @@ init([Kind, Energy, Genes] = Args) ->
     }}.
 
 % destructor
-terminate(Reason, State) ->
-    io:format("terminate: ~p, ~p~n", [Reason, State]),
-    ok.
+terminate(Reason, Body) ->
+    io:format("terminate: ~p, ~p~n", [Reason, Body]),
+    world:die(self()).
 
 handle_call(turn, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?TURN_COST ->
     {stop, no_energy, Body};

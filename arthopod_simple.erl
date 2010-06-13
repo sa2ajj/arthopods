@@ -16,6 +16,7 @@ give_birth(Body, Genes) ->
 life(Body, Genes) ->
     io:format("Bug: ~p~n", [[Body, Genes]]),
     arthopod:turn(Body),
+    arthopod:move(Body),
     life(Body, Genes).
 
 % vim:ts=4:sw=4:et

@@ -69,6 +69,9 @@ give_birth(Kind, Energy, Genes) ->
             {error, Other}
     end.
 
+spawn_one(Kind, Energy, Genes) ->
+    gen_server:start_link(?MODULE, [Kind, Energy, Genes], []).
+
 %% {{{ CALLBACK IMPLEMENTATION
 
 % constructor
@@ -129,9 +132,6 @@ code_change(_OldVsn, Body, _Extra) ->
 %% }}}
 
 %% HELPER FUNCTIONS
-spawn_one(Kind, Energy, Genes) ->
-    gen_server:start_link(?MODULE, [Kind, Energy, Genes], []).
-
 random_dir() -> select:uniform(?DIRECTIONS).
 
 turn(Body) when is_pid(Body) ->

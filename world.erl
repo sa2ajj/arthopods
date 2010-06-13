@@ -8,7 +8,7 @@
 
 % inteface definition
 -export([start/1, stop/0, cast/1, call/1]).
--export([give_birth/2, die/1, move/2]).
+-export([give_birth/2, die/1, move/2, split/2]).
 
 % gen_server behaviour callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
@@ -43,6 +43,9 @@ die(Body) ->
 
 move(Body, Delta) ->
     gen_server:call(?MODULE, {move, Body, Delta}).
+
+split(Body, BugSpecs) ->
+    gen_server:call(?MODULE, {split, Body, BugSpecs}).
 
 % callback implementation
 init([Parent, Size]) ->
@@ -80,13 +83,23 @@ handle_call({give_birth, Species, Parameters}, _From, #world_state{size={Width, 
             {reply, ok, State}
     end;
 
+handle_call({split, Body, BugSpecs}, _From, #world_state{bugs=Bugs} = State) ->
+    case die(Body, Bugs) of
+        {ok, Location, Bugs0} ->
+            NewBugs = lists:foldl(fun give_birth_foldr/2, {Location, Bugs0}, BugSpecs),
+            {reply, ok, State#world_state{bugs=NewBugs}};
+
+        {error, _} ->
+            {reply, not_found, State}
+    end;
+
 handle_call(Request, From, State) ->
     io:format("handle_call: ~p, ~p, ~p~n", [Request, From, State]),
     {noreply, State}.
 
 handle_cast({die, Body}, #world_state{bugs=Bugs} = State) ->
     case die(Body, Bugs) of
-        {ok, NewBugs} ->
+        {ok, _Location, NewBugs} ->
             {noreply, State#world_state{bugs=NewBugs}};
 
         {error, _} ->
@@ -150,11 +163,20 @@ give_birth(Species, Parameters, Location, Bugs) ->
             {error, Bugs}
     end.
 
+give_birth_foldr({Species, Parameters}, {Location, Bugs}) ->
+    case give_birth(Species, Parameters, Location, Bugs) of
+        {ok, NewBugs} ->
+            {Location, NewBugs};
+
+        {error, _Error} ->
+            {Location, Bugs}
+    end.
+
 die(Body, Bugs) ->
     case dict:find(Body, Bugs) of
-        {ok, {BodyObject, _Location}} ->
+        {ok, {BodyObject, Location}} ->
             world_viewer:kill_bug(BodyObject),
-            {ok, dict:erase(Body, Bugs)};
+            {ok, Location, dict:erase(Body, Bugs)};
 
         error ->
             {error, Bugs}

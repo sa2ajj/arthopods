@@ -105,13 +105,19 @@ handle_call(move, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?MO
     {stop, no_energy, Body};
 
 handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction} = Body) ->
-    case world:move(self(), lists:keyfind(Direction, 1, ?DELTAS)) of
-        ok ->
-            timer:sleep(?MOVE_TIME),
-            {reply, ok, Body#arthopod_body{energy=Energy-?MOVE_COST}};
+    case lists:keyfind(Direction, 1, ?DELTAS) of
+        false ->
+            {stop, unknown_direction, Body};
 
-        error ->
-            {stop, not_known_to_world, Body}     % world does not know us? commit suicide!
+        {Direction, Delta} ->
+            case world:move(self(), Delta) of
+                ok ->
+                    timer:sleep(?MOVE_TIME),
+                    {reply, ok, Body#arthopod_body{energy=Energy-?MOVE_COST}};
+
+                error ->
+                    {stop, not_known_to_world, Body}     % world does not know us? commit suicide!
+            end
     end;
 
 handle_call(Request, From, Body) ->

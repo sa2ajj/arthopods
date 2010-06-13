@@ -10,7 +10,7 @@
 -export([behaviour_info/1]).
 
 % API export
--export([give_birth/2, give_birth/3, spawn_one/2, spawn_one/3]).
+-export([give_birth/1, give_birth/2, give_birth/3, spawn_one/2, spawn_one/3]).
 -export([move/1, turn/1]).
 
 % gen_server callbacks
@@ -35,6 +35,7 @@
     {left, {-1, 1}}
 ]).
 -define(MAX_GENE_VALUE, 10).
+-define(ARTHOPOD_DEFAULT_ENERGY, 200).
 -define(TURN_COST, 1).
 -define(MOVE_COST, 2).
 %% }}}
@@ -49,6 +50,9 @@ behaviour_info(_Other) ->
 
 subspecies_module(Kind) ->
     list_to_atom(?PREFIX++atom_to_list(Kind)).
+
+give_birth(Kind) ->
+    give_birth(Kind, ?ARTHOPOD_DEFAULT_ENERGY).
 
 give_birth(Kind, Energy) ->
     case supervisor:start_child(arthopod_sup, [Kind, Energy]) of

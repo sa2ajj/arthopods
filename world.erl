@@ -106,7 +106,7 @@ handle_info({welcome, _}, State) ->
     {noreply, State};
 
 handle_info({food, Location}, #world_state{grass=Grass} = State) ->
-    io:format(" food (~p)!~n", [Location]),
+    % io:format(" food @ ~p~n", [Location]),
     case dict:find(Location, Grass) of
         {ok, _} ->
             io:format("We already have one at ~p~n", [Location]),

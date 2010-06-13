@@ -55,16 +55,7 @@ give_birth(Kind) ->
     give_birth(Kind, ?ARTHOPOD_DEFAULT_ENERGY).
 
 give_birth(Kind, Energy) ->
-    case supervisor:start_child(arthopod_sup, [Kind, Energy]) of
-        {ok, Pid} when is_pid(Pid) ->
-            {ok, Pid};
-
-        {error, Error} ->
-            {error, Error};
-
-        Other ->
-            {error, Other}
-    end.
+    give_birth(Kind, Energy, make_genes()).
 
 give_birth(Kind, Energy, Genes) ->
     case supervisor:start_child(arthopod_sup, [Kind, Energy, Genes]) of

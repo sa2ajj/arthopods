@@ -77,7 +77,7 @@ spawn_one(Kind, Energy, Genes) ->
 %% {{{ CALLBACK IMPLEMENTATION
 
 % constructor
-init([Kind, Energy, Genes] = Args) ->
+init([Kind, Energy, Genes] = _Args) ->
     % io:format("init: ~p~n", [Args]),
     Module = subspecies_module(Kind),
     {ok, #arthopod_body{
@@ -89,7 +89,7 @@ init([Kind, Energy, Genes] = Args) ->
     }}.
 
 % destructor
-terminate(Reason, Body) ->
+terminate(_Reason, _Body) ->
     % io:format("terminate: ~p, ~p~n", [Reason, Body]),
     world:die(self()).
 

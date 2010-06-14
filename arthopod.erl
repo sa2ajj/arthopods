@@ -27,12 +27,12 @@
 -define(PREFIX, "arthopod_").
 -define(DIRECTIONS, [forward, right, strong_right, backward, strong_left, left]).
 -define(DELTAS, [
-    {forward, {0, 1}},
-    {right, {1, 1}},
-    {strong_right, {1, -1}},
-    {backward, {0, -1}},
-    {strong_left, {-1, -1}},
-    {left, {-1, 1}}
+    {forward, {0, 2}},
+    {right, {2, 1}},
+    {strong_right, {2, -1}},
+    {backward, {0, -2}},
+    {strong_left, {-2, -1}},
+    {left, {-2, 1}}
 ]).
 -define(MAX_GENE_VALUE, 10).
 -define(ARTHOPOD_DEFAULT_ENERGY, 200).

@@ -78,7 +78,7 @@ spawn_one(Kind, Energy, Genes) ->
 
 % constructor
 init([Kind, Energy, Genes] = Args) ->
-    io:format("init: ~p~n", [Args]),
+    % io:format("init: ~p~n", [Args]),
     Module = subspecies_module(Kind),
     {ok, #arthopod_body{
         subspecies=Kind,
@@ -90,7 +90,7 @@ init([Kind, Energy, Genes] = Args) ->
 
 % destructor
 terminate(Reason, Body) ->
-    io:format("terminate: ~p, ~p~n", [Reason, Body]),
+    % io:format("terminate: ~p, ~p~n", [Reason, Body]),
     world:die(self()).
 
 handle_call(turn, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?TURN_COST ->

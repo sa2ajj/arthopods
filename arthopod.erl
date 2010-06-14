@@ -40,6 +40,7 @@
 -define(TURN_TIME, 20).
 -define(MOVE_COST, 2).
 -define(MOVE_TIME, 100).
+-define(FOOD_ENERGY, 30).
 %% }}}
 
 %% {{{ behaviour description
@@ -119,6 +120,9 @@ handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction} = Bo
                     {stop, normal, not_known_to_world, Body}    % world does not know us? commit suicide!
             end
     end;
+
+handle_call(eat, _, #arthopod_body{energy=Energy} = Body) ->
+    {reply, ok, Body#arthopod_body{energy=Energy+?FOOD_ENERGY}};
 
 handle_call(Request, From, Body) ->
     io:format("handle_call: ~p, ~p, ~p~n", [Request, From, Body]),

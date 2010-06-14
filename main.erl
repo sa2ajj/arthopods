@@ -18,7 +18,7 @@ start() ->
         {ok, World} ->
             io:format("World has been created (~p)~n", [World]),
             World ! { welcome, "Thank you for being there" },
-            food_generator:start(World, 2000),      % generate a piece of food every 2 secs
+            food_generator:start(World, 200),       % generate a piece of food every 200 msecs
             populate_world(3),
             loop();
         Other ->

@@ -283,7 +283,7 @@ find({patch, {Xc, Yc} = Center, Patch1, Patch2, Patch3, Patch4} = Field, {{Xl, Y
 
 % empty nodes and wrong leaves
 find(Field, _Boundaries, _Requestor) ->
-    Field.
+    {old, Field}.
 
 %% debug dump
 

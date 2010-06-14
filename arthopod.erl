@@ -11,7 +11,7 @@
 
 % API export
 -export([give_birth/1, give_birth/2, give_birth/3, spawn_one/3]).
--export([move/1, turn/1]).
+-export([move/1, turn/1, eat/1]).
 
 % gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
@@ -149,6 +149,9 @@ turn(Body) when is_pid(Body) ->
 
 move(Body) when is_pid(Body) ->
     gen_server:call(Body, move).
+
+eat(Body) when is_pid(Body) ->
+    gen_server:call(Body, eat).
 
 turn(Direction, Turn) ->
     turn(Direction, Turn, ?DIRECTIONS).

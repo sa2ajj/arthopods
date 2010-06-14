@@ -113,7 +113,6 @@ handle_cast(Request, State) ->
     io:format("handle_cast: ~p, ~p~n", [Request, State]),
     {noreply, State}.
 
-
 handle_info({welcome, _}, State) ->
     io:format(" welcomed.~n"),
     {noreply, State};

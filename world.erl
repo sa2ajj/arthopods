@@ -86,7 +86,12 @@ handle_call({give_birth, Species, Parameters}, _From, #world_state{size={Width, 
 handle_call({split, Body, BugSpecs}, _From, #world_state{bugs=Bugs} = State) ->
     case die(Body, Bugs) of
         {ok, Location, Bugs0} ->
-            NewBugs = lists:foldl(fun give_birth_foldr/2, {Location, Bugs0}, BugSpecs),
+            NewBugs = lists:foldl(fun
+                ({Species, Parameters}, BugsIn) ->
+                    % we do not care about the error code as the new dictionary is always returned
+                    {_, BugsOut} = give_birth(Species, Parameters, Location, BugsIn),
+                    BugsOut
+            end, Bugs0, BugSpecs),
             {reply, ok, State#world_state{bugs=NewBugs}};
 
         {error, _} ->
@@ -160,15 +165,6 @@ give_birth(Species, Parameters, Location, Bugs) ->
 
         {error, _Error} ->
             {error, Bugs}
-    end.
-
-give_birth_foldr({Species, Parameters}, {Location, Bugs}) ->
-    case give_birth(Species, Parameters, Location, Bugs) of
-        {ok, NewBugs} ->
-            {Location, NewBugs};
-
-        {error, _Error} ->
-            {Location, Bugs}
     end.
 
 die(Body, Bugs) ->

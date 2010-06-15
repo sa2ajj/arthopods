@@ -9,6 +9,7 @@
 
 -define(WORLD_SIZE, {700, 400}).
 -define(FOOD_FREQUENCY, 20).        % generate a piece of food every 20 msecs
+-define(BUGS_TO_CREATE, 1).
 
 start() ->
     io:format("great stuff will be here :)~n"),
@@ -20,7 +21,7 @@ start() ->
             io:format("World has been created (~p)~n", [World]),
             World ! { welcome, "Thank you for being there" },
             food_generator:start(World, ?FOOD_FREQUENCY),
-            populate_world(3),
+            populate_world(?BUGS_TO_CREATE),
             loop();
         Other ->
             io:format("Failed to create the world: ~p~n", [Other])

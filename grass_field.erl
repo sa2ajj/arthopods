@@ -61,7 +61,7 @@ handle_cast({cut, Requestor, Location}, Field) ->
     {noreply, NewField};
 
 handle_cast({find, Requestor, Boundaries}, Field) ->
-    NewField = find(Field, Boundaries, Requestor),
+    {_, NewField} = find(Field, Boundaries, Requestor),
     Requestor ! {ack_find},
     {noreply, NewField};
 

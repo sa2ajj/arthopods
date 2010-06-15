@@ -18,6 +18,7 @@ life(Body, Genes) ->
     arthopod:turn(Body),
     arthopod:move(Body),
     arthopod:eat(Body),
+    arthopod:split(Body),
     life(Body, Genes).
 
 % vim:ts=4:sw=4:et

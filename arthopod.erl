@@ -11,7 +11,7 @@
 
 % API export
 -export([give_birth/1, give_birth/2, give_birth/3, spawn_one/3]).
--export([move/1, turn/1, eat/1]).
+-export([move/1, turn/1, eat/1, split/1]).
 
 % gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
@@ -41,6 +41,7 @@
 -define(MOVE_COST, 2).
 -define(MOVE_TIME, 100).
 -define(FOOD_ENERGY, 30).
+-define(SPLIT_ENERGY, 700).
 %% }}}
 
 %% {{{ behaviour description
@@ -124,6 +125,19 @@ handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction} = Bo
 handle_call(eat, _, #arthopod_body{energy=Energy} = Body) ->
     {reply, ok, Body#arthopod_body{energy=Energy+?FOOD_ENERGY}};
 
+handle_call(split, _, #arthopod_body{subspecies=Kind, energy=Energy, genes=Genes} = Body) ->
+    if
+        Energy >= ?SPLIT_ENERGY ->
+            {Genes1, Genes2} = mutate_genes(Genes),
+            Energy1 = Energy div 2,
+            Energy2 = Energy - Energy1,
+            world:split(self(), [{arthopod, [Kind, Energy1, Genes1]}, {arthopod, [Kind, Energy2, Genes2]}]),
+            {stop, normal, spawn_children, Body};
+
+        true ->
+            {reply, ok, Body}
+    end;
+
 handle_call(Request, From, Body) ->
     io:format("handle_call: ~p, ~p, ~p~n", [Request, From, Body]),
     {reply, ok, Body}.
@@ -157,6 +171,9 @@ move(Body) when is_pid(Body) ->
 eat(Body) when is_pid(Body) ->
     gen_server:call(Body, eat).
 
+split(Body) when is_pid(Body) ->
+    gen_server:call(Body, split).
+
 turn(Direction, Turn) ->
     turn(Direction, Turn, ?DIRECTIONS).
 
@@ -167,5 +184,39 @@ turn(Direction, Turn, Directions) ->
 
 make_genes() ->
     [ {Gene, random:uniform(?MAX_GENE_VALUE)} || Gene <- ?DIRECTIONS ].
+
+mutate_genes(Genes) ->
+    {Gene, Value} = lists:nth(random:uniform(length(Genes)), Genes),
+
+    IncGene = fun
+        ({X, Y}) when X==Gene -> {Gene, Y+1};
+        ({X, Y}) -> {X, Y}
+    end,
+
+    DecGene = fun
+        ({X, Y}) when X==Gene -> {Gene, Y-1};
+        ({X, Y}) -> {X, Y}
+    end,
+
+    IncOthers = fun
+        ({X, Y}) when X==Gene -> {Gene, Y};
+        ({X, Y}) -> {X, lists:min([Y+1, ?MAX_GENE_VALUE])}
+    end,
+
+    DecOthers = fun
+        ({X, Y}) when X==Gene -> {Gene, Y};
+        ({X, Y}) -> {X, lists:max([Y-1, ?MAX_GENE_VALUE])}
+    end,
+
+    case Value of
+        0 ->
+            {lists:map(IncGene, Genes), lists:map(IncOthers, Genes)};
+
+        ?MAX_GENE_VALUE ->
+            {lists:map(DecOthers, Genes), lists:map(DecGene, Genes)};
+
+        _ ->
+            {lists:map(IncGene, Genes), lists:map(DecGene, Genes)}
+    end.
 
 % vim:ts=4:sw=4:et

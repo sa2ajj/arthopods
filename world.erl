@@ -8,7 +8,9 @@
 
 % inteface definition
 -export([start/1, stop/0, cast/1, call/1]).
--export([give_birth/2, die/1, move/2, split/2]).
+-export([give_birth/2, die/1, move/2, eat/1, split/2]).
+
+-export([collect_leaves/2]).
 
 % gen_server behaviour callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
@@ -43,6 +45,9 @@ die(Body) ->
 
 move(Body, Delta) ->
     gen_server:call(?MODULE, {move, Body, Delta}).
+
+eat(Body) ->
+    gen_server:call(?MODULE, {eat, Body}).
 
 split(Body, BugSpecs) ->
     gen_server:call(?MODULE, {split, Body, BugSpecs}).
@@ -81,6 +86,25 @@ handle_call({give_birth, Species, Parameters}, _From, #world_state{size={Width, 
 
         {error, _Error} ->
             {reply, ok, State}
+    end;
+
+handle_call({eat, Body}, _From, #world_state{bugs=Bugs, grass=Grass} = State) ->
+    case dict:find(Body, Bugs) of
+        {ok, {_, {X, Y}}} ->
+            % io:format("looking for food around ~p~n", [{X, Y}]),
+            case find_leaves({{X-1, Y-1}, {X+1, Y+1}}) of
+                [] ->
+                    % io:format("  found no leaves~n"),
+                    {reply, 0, State};
+
+                Leaves ->
+                    % io:format("  found leaves: ~p~n", [Leaves]),
+                    NewGrass = cut_leaves(Leaves, Grass),
+                    {reply, length(Leaves), State#world_state{grass=NewGrass}}
+            end;
+
+        error ->
+            {reply, 0, State}
     end;
 
 handle_call({split, Body, BugSpecs}, _From, #world_state{bugs=Bugs} = State) ->
@@ -175,6 +199,39 @@ die(Body, Bugs) ->
 
         error ->
             {error, Bugs}
+    end.
+
+find_leaves(Boundaries) ->
+    spawn(?MODULE, collect_leaves, [self(), Boundaries]),
+    receive
+        {leaves, Leaves} ->
+            Leaves
+    end.
+
+collect_leaves(Parent, Boundaries) ->
+    grass_field:find(Boundaries),
+    do_collect_leaves(Parent, []).
+
+do_collect_leaves(Parent, Result) ->
+    receive
+        {ack_find} ->
+            Parent ! {leaves, Result},
+            exit(normal);
+        {leaf, Leaf} ->
+            do_collect_leaves(Parent, [Leaf | Result])
+    end.
+
+cut_leaves([], Grass) ->
+    Grass;
+
+cut_leaves([Leaf | Rest], Grass) ->
+    case dict:find(Leaf, Grass) of
+        {ok, LeafObject} ->
+            world_viewer:cut_leaf(LeafObject),
+            cut_leaves(Rest, dict:erase(Leaf, Grass));
+
+        error ->        % this should never happen though...
+            cut_leaves(Rest, Grass)
     end.
 
 %% }}}

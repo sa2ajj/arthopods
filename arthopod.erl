@@ -123,7 +123,13 @@ handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction} = Bo
     end;
 
 handle_call(eat, _, #arthopod_body{energy=Energy} = Body) ->
-    {reply, ok, Body#arthopod_body{energy=Energy+?FOOD_ENERGY}};
+    case world:eat(self()) of
+        0 ->
+            {reply, ok, Body};
+
+        LeafNo ->
+            {reply, ok, Body#arthopod_body{energy=Energy+?FOOD_ENERGY*LeafNo}}
+    end;
 
 handle_call(split, _, #arthopod_body{subspecies=Kind, energy=Energy, genes=Genes} = Body) ->
     if

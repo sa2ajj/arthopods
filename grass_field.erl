@@ -67,7 +67,7 @@ handle_cast({find, Requestor, Boundaries}, Field) ->
 
 handle_cast({dump, Requestor}, Field) ->
     dump(Field),
-    Requestor ! ack_dump,
+    Requestor ! {ack_dump},
     {noreply, Field};
 
 handle_cast(Request, State) ->

@@ -40,7 +40,7 @@
 -define(TURN_TIME, 20).
 -define(MOVE_COST, 2).
 -define(MOVE_TIME, 100).
--define(FOOD_ENERGY, 30).
+-define(FOOD_ENERGY, 10).
 -define(SPLIT_ENERGY, 700).
 %% }}}
 

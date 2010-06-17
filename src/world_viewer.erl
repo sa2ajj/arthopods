@@ -13,14 +13,14 @@
 -define(GRAS_COLOUR, {0, 16#64, 0}).
 
 %% server interface
--export([start/1, stop/0, make_bug/1, move_bug/2, kill_bug/1, grow_leaf/1, cut_leaf/1]).
+-export([start_link/1, stop/0, make_bug/1, move_bug/2, kill_bug/1, grow_leaf/1, cut_leaf/1]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 %% interface implementation
 
-start(Size) ->
+start_link(Size) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, Size, []).
 
 stop() ->

@@ -15,7 +15,7 @@ start() ->
     io:format("great stuff will be here :)~n"),
     random:seed(now()),
     Size = ?WORLD_SIZE,
-    world_viewer:start(Size),
+    world_viewer:start_link(Size),
     arthopod_sup:start_link(),      % TODO: how to do it properly?
     case world:start(Size) of
         {ok, World} ->

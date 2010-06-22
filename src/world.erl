@@ -142,8 +142,8 @@ handle_cast(Request, State) ->
     io:format("handle_cast: ~p, ~p~n", [Request, State]),
     {noreply, State}.
 
-handle_info({welcome, _}, State) ->
-    io:format(" welcomed.~n"),
+handle_info({welcome, How}, State) ->
+    io:format("Welcomed: ~p~n", [How]),
     {noreply, State};
 
 handle_info({food, Location}, #world_state{grass=Grass} = State) ->

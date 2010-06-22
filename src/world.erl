@@ -150,7 +150,7 @@ handle_info({food, Location}, #world_state{grass=Grass} = State) ->
     % io:format(" food @ ~p~n", [Location]),
     case dict:find(Location, Grass) of
         {ok, _} ->
-            io:format("We already have one at ~p~n", [Location]),
+            % io:format("We already have one at ~p~n", [Location]),
             {noreply, State};
 
         error ->
@@ -160,7 +160,7 @@ handle_info({food, Location}, #world_state{grass=Grass} = State) ->
     end;
 
 handle_info({size, Pid}, #world_state{size=Size} = State) ->
-    io:format(" size requested from ~p~n", [ Pid ]),
+    % io:format(" size requested from ~p~n", [ Pid ]),
     Pid ! {size, Size},
     {noreply, State};
 

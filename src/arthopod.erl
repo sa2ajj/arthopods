@@ -128,6 +128,7 @@ handle_call(eat, _, #arthopod_body{energy=Energy} = Body) ->
             {reply, ok, Body};
 
         LeafNo ->
+            io:format("Got ~p pieces of food.~n", [LeafNo]),
             {reply, ok, Body#arthopod_body{energy=Energy+?FOOD_ENERGY*LeafNo}}
     end;
 

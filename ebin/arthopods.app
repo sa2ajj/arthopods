@@ -1,5 +1,5 @@
 {application, arthopods, [
-    {description, ""},
+    {description, "Arthopods Simulated Evolution"},
     {vsn, "0.0"},
     {modules, [
         arthopods_app,

@@ -1,5 +1,3 @@
-%
-
 -module(main).
 
 -author("Alexey Vyskubov <alexey@mawhrin.net>").
@@ -21,7 +19,7 @@ start() ->
     case world:start(Size) of
         {ok, World} ->
             io:format("World has been created (~p)~n", [World]),
-            World ! { welcome, "Thank you for being there" },
+            World ! {welcome, "Thank you for being there"},
             food_generator:start(World, ?FOOD_FREQUENCY, ?INITIAL_COVERAGE),
             populate_world(?BUGS_TO_CREATE),
             loop();
@@ -34,7 +32,7 @@ populate_world(0) ->
 
 populate_world(Number) ->
     world:give_birth(arthopod, [simple]),
-    populate_world(Number-1).
+    populate_world(Number - 1).
 
 loop() -> loop().
 

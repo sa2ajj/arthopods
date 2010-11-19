@@ -19,7 +19,6 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 %% interface implementation
-
 start_link(Size) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, Size, []).
 
@@ -42,12 +41,11 @@ cut_leaf(Leaf) ->
     gen_server:cast(?MODULE, {cut_leaf, Leaf}).
 
 %% gen_server callbacks implementation
-
 init(Size) ->
     Gs = gs:start(),
     {RealWidth, RealHeight} = real_coords(Size, 2),
-    Window = gs:create(window, Gs, [ {width, RealWidth}, {height, RealHeight}, {title, "Arthopods World"}, {map, true} ]),
-    Canvas = gs:create(canvas, Window, [ {x, 0}, {y, 0}, {width, RealWidth}, {height, RealHeight} ]),
+    Window = gs:create(window, Gs, [{width, RealWidth}, {height, RealHeight}, {title, "Arthopods World"}, {map, true}]),
+    Canvas = gs:create(canvas, Window, [{x, 0}, {y, 0}, {width, RealWidth}, {height, RealHeight}]),
     {ok, Canvas}.
 
 terminate(_Reason, _Canvas) ->
@@ -61,7 +59,6 @@ handle_call({make_bug, Location}, _From, Canvas) ->
         {fg, ?BUG_COLOUR},
         {fill, ?BUG_COLOUR}
     ]), Canvas};
-
 handle_call({grow_leaf, Location}, _From, Canvas) ->
     {reply, gs:create(rectangle, Canvas, [
         {coords, grass_rect(Location)},
@@ -69,26 +66,21 @@ handle_call({grow_leaf, Location}, _From, Canvas) ->
         {fg, ?GRAS_COLOUR},
         {fill, ?GRAS_COLOUR}
     ]), Canvas};
-
 handle_call(Request, From, Canvas) ->
     io:format("handle_call: ~p, ~p, ~p~n", [Request, From, Canvas]),
     {noreply, Canvas}.
 
 handle_cast({stop, Reason}, Canvas) ->
     {stop, Reason, Canvas};
-
 handle_cast({move_bug, Bug, Location}, Canvas) ->
     gs:config(Bug, [{coords, bug_rect(Location)}]),
     {noreply, Canvas};
-
 handle_cast({kill_bug, Bug}, Canvas) ->
     gs:destroy(Bug),
     {noreply, Canvas};
-
 handle_cast({cut_leaf, Leaf}, Canvas) ->
     gs:destroy(Leaf),
     {noreply, Canvas};
-
 handle_cast(Request, Canvas) ->
     io:format("handle_cast: ~p, ~p~n", [Request, Canvas]),
     {noreply, Canvas}.
@@ -102,7 +94,6 @@ code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 %% a few helper functions
-
 real_coords(Location) ->
     real_coords(Location, 1).
 
@@ -110,11 +101,11 @@ real_coords({X, Y}, Offset) ->
     {(X+Offset)*?CELL_SIZE, (Y+Offset)*?CELL_SIZE}.
 
 bug_rect(Location) ->
-    { RealX, RealY } = real_coords(Location, 0),
-    [ {RealX, RealY}, {RealX+3*?CELL_SIZE-1, RealY+3*?CELL_SIZE-1} ].
+    {RealX, RealY} = real_coords(Location, 0),
+    [{RealX, RealY}, {RealX+3*?CELL_SIZE-1, RealY+3*?CELL_SIZE-1}].
 
 grass_rect(Location) ->
-    { RealX, RealY } = RealLocation = real_coords(Location),
-    [ RealLocation, {RealX+?CELL_SIZE-1, RealY+?CELL_SIZE-1} ].
+    {RealX, RealY} = RealLocation = real_coords(Location),
+    [RealLocation, {RealX+?CELL_SIZE-1, RealY+?CELL_SIZE-1}].
 
 % vim:ts=4:sw=4:et

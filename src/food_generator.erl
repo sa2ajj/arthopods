@@ -1,5 +1,3 @@
-%
-
 -module(food_generator).
 
 -author("Alexey Vyskubov <alexey@mawhrin.net>").
@@ -12,9 +10,9 @@ start(World, Ticks, Coverage) ->
 
 food_loop0(World, Ticks, Coverage) when (Coverage >= 0) and (Coverage < 1) ->
     io:format("Food is unlimited!~n"),
-    World ! { size, self() },
+    World ! {size, self()},
     receive
-        { size, {Width, Height} = Size } ->
+        {size, {Width, Height}=Size} ->
             io:format("World size is ~p~n", [Size]),
             InitialPieces = trunc(Width*Height*Coverage),
             io:format("Pre-populating ~p pieces...", [InitialPieces]),
@@ -23,7 +21,7 @@ food_loop0(World, Ticks, Coverage) when (Coverage >= 0) and (Coverage < 1) ->
             food_loop(World, Ticks, Size);
 
         Other ->
-            io:format("Food generator got: ~p~nFood generator cannot continue.~n", [ Other ])
+            io:format("Food generator got: ~p~nFood generator cannot continue.~n", [Other])
     end.
 
 food_loop(World, Ticks, Size) ->
@@ -35,14 +33,13 @@ food_loop(World, Ticks, Size) ->
 
 plant_grass(_Size, _World, 0) ->
     void;
-
 plant_grass(Size, World, N) ->
     Location = get_food(Size),
-    % io:format("Food @ ~p~n", [ { food, Location } ]),
-    World ! { food, Location },
-    plant_grass(Size, World, N-1).
+    % io:format("Food @ ~p~n", [{food, Location}]),
+    World ! {food, Location},
+    plant_grass(Size, World, N - 1).
 
-get_food({ Width, Height }) ->
-    { random:uniform(Width), random:uniform(Height) }.
+get_food({Width, Height}) ->
+    {random:uniform(Width), random:uniform(Height)}.
 
 % vim:ts=4:sw=4:et

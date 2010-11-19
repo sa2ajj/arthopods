@@ -1,11 +1,10 @@
-%
 -module(arthopod).
 -behaviour(gen_server).
 
 -author("Alexey Vyskubov <alexey@mawhrin.net>").
 -author("Mikhail Sobolev <mss@mawhrin.net>").
 
-%% {{{ EXPORTS
+%% {{{ Exports
 % behaviour info for arthopod
 -export([behaviour_info/1]).
 
@@ -17,7 +16,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 %% }}}
 
-%% {{{ DEFINITIONS
+%% {{{ Definitions
 % data structure
 -record(arthopod_body, {
     subspecies, energy, brain, genes, direction
@@ -76,11 +75,9 @@ give_birth(Kind, Energy, Genes) ->
 spawn_one(Kind, Energy, Genes) ->
     gen_server:start_link(?MODULE, [Kind, Energy, Genes], []).
 
-%% {{{ CALLBACK IMPLEMENTATION
-
+%% {{{ Callback implementation
 % constructor
-init([Kind, Energy, Genes] = _Args) ->
-    % io:format("init: ~p~n", [Args]),
+init([Kind, Energy, Genes]) ->
     Module = subspecies_module(Kind),
     {ok, #arthopod_body{
         subspecies=Kind,
@@ -95,18 +92,18 @@ terminate(_Reason, _Body) ->
     % io:format("terminate: ~p, ~p~n", [Reason, Body]),
     world:die(self()).
 
-handle_call(turn, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?TURN_COST ->
+handle_call(turn, _From, #arthopod_body{energy=Energy}=Body) when Energy < ?TURN_COST ->
     {stop, normal, no_energy, Body};
 
-handle_call(turn, _From, #arthopod_body{direction=Direction, energy=Energy, genes=Genes} = Body) ->
+handle_call(turn, _From, #arthopod_body{direction=Direction, energy=Energy, genes=Genes}=Body) ->
     NewDirection = turn(Direction, select:quadratic(Genes)),
     timer:sleep(?TURN_TIME),
     {reply, ok, Body#arthopod_body{direction=NewDirection, energy=Energy-?TURN_COST}};
 
-handle_call(move, _From, #arthopod_body{energy=Energy} = Body) when Energy < ?MOVE_COST ->
+handle_call(move, _From, #arthopod_body{energy=Energy}=Body) when Energy < ?MOVE_COST ->
     {stop, normal, no_energy, Body};
 
-handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction} = Body) ->
+handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction}=Body) ->
     case lists:keyfind(Direction, 1, ?DELTAS) of
         false ->
             {stop, normal, unknown_direction, Body};
@@ -122,7 +119,7 @@ handle_call(move, _From, #arthopod_body{energy=Energy, direction=Direction} = Bo
             end
     end;
 
-handle_call(eat, _, #arthopod_body{energy=Energy} = Body) ->
+handle_call(eat, _, #arthopod_body{energy=Energy}=Body) ->
     case world:eat(self()) of
         0 ->
             {reply, ok, Body};
@@ -132,7 +129,7 @@ handle_call(eat, _, #arthopod_body{energy=Energy} = Body) ->
             {reply, ok, Body#arthopod_body{energy=Energy+?FOOD_ENERGY*LeafNo}}
     end;
 
-handle_call(split, _, #arthopod_body{subspecies=Kind, energy=Energy, genes=Genes} = Body) ->
+handle_call(split, _, #arthopod_body{subspecies=Kind, energy=Energy, genes=Genes}=Body) ->
     if
         Energy >= ?SPLIT_ENERGY ->
             {Genes1, Genes2} = mutate_genes(Genes),
@@ -163,11 +160,11 @@ handle_info(Info, Body) ->
 
 code_change(_OldVsn, Body, _Extra) ->
     {ok, Body}.
-
 %% }}}
 
-%% HELPER FUNCTIONS
-random_dir() -> select:uniform(?DIRECTIONS).
+%% {{{ Helper functions
+random_dir() ->
+    select:uniform(?DIRECTIONS).
 
 turn(Body) when is_pid(Body) ->
     gen_server:call(Body, turn).
@@ -185,12 +182,12 @@ turn(Direction, Turn) ->
     turn(Direction, Turn, ?DIRECTIONS).
 
 turn(Direction, Turn, Directions) ->
-    DirectionValue = utils:index(Direction, Directions)-1,
-    TurnValue = utils:index(Turn, Directions)-1,
-    lists:nth(((DirectionValue+TurnValue) rem length(Directions))+1, Directions).
+    DirectionValue = utils:index(Direction, Directions) - 1,
+    TurnValue = utils:index(Turn, Directions) - 1,
+    lists:nth(((DirectionValue + TurnValue) rem length(Directions)) + 1, Directions).
 
 make_genes() ->
-    [ {Gene, random:uniform(?MAX_GENE_VALUE)} || Gene <- ?DIRECTIONS ].
+    [{Gene, random:uniform(?MAX_GENE_VALUE)} || Gene <- ?DIRECTIONS].
 
 mutate_genes(Genes) ->
     {Gene, Value} = lists:nth(random:uniform(length(Genes)), Genes),
@@ -225,5 +222,6 @@ mutate_genes(Genes) ->
         _ ->
             {lists:map(IncGene, Genes), lists:map(DecGene, Genes)}
     end.
+%% }}}
 
 % vim:ts=4:sw=4:et

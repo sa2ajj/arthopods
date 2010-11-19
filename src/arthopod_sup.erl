@@ -1,5 +1,3 @@
-%
-
 -module(arthopod_sup).
 -behaviour(supervisor).
 
@@ -18,7 +16,7 @@ start_link() ->
 
 % supervisor callback implementation
 init(none) ->
-    { ok, {
+    {ok, {
         {simple_one_for_one, 0, 1},
         [
             {

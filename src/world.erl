@@ -1,5 +1,3 @@
-%
-
 -module(world).
 -behaviour(gen_server).
 
@@ -57,7 +55,7 @@ init([Parent, Size]) ->
     io:format("The world is about to revolve.~n"),
     process_flag(trap_exit, true),          % follow exits of interesting processes
     grass_field:start(lists:max(tuple_to_list(Size))),
-    Parent ! { world, self() },
+    Parent ! {world, self()},
     io:format("We are as big as ~p~n", [Size]),
     Bugs = dict:new(),      % Pid -> {GsObject, Location}
     Grass = dict:new(),     % Location -> GsObject
@@ -67,7 +65,7 @@ terminate(Reason, State) ->
     io:format("terminate: ~p, ~p~n", [Reason, State]),
     ok.
 
-handle_call({move, Body, {DX, DY}}, _From, #world_state{size={Width, Height}, bugs=Bugs} = State) ->
+handle_call({move, Body, {DX, DY}}, _From, #world_state{size={Width, Height}, bugs=Bugs}=State) ->
     {Reply, NewBugs} = case dict:find(Body, Bugs) of
         {ok, {BodyObject, {X, Y}}} ->
             NewLocation = {(X+DX+Width) rem Width, (Y+DY+Height) rem Height},
@@ -78,8 +76,7 @@ handle_call({move, Body, {DX, DY}}, _From, #world_state{size={Width, Height}, bu
             {error, Bugs}
     end,
     {reply, Reply, State#world_state{bugs=NewBugs}};
-
-handle_call({give_birth, Species, Parameters}, _From, #world_state{size={Width, Height}, bugs=Bugs} = State) ->
+handle_call({give_birth, Species, Parameters}, _From, #world_state{size={Width, Height}, bugs=Bugs}=State) ->
     case give_birth(Species, Parameters, {random:uniform(Width)-1, random:uniform(Height)-1}, Bugs) of
         {ok, NewBugs} ->
             {reply, ok, State#world_state{bugs=NewBugs}};
@@ -87,8 +84,7 @@ handle_call({give_birth, Species, Parameters}, _From, #world_state{size={Width, 
         {error, _Error} ->
             {reply, ok, State}
     end;
-
-handle_call({eat, Body}, _From, #world_state{bugs=Bugs, grass=Grass} = State) ->
+handle_call({eat, Body}, _From, #world_state{bugs=Bugs, grass=Grass}=State) ->
     case dict:find(Body, Bugs) of
         {ok, {_, {X, Y}}} ->
             % io:format("looking for food around ~p~n", [{X, Y}]),
@@ -106,8 +102,7 @@ handle_call({eat, Body}, _From, #world_state{bugs=Bugs, grass=Grass} = State) ->
         error ->
             {reply, 0, State}
     end;
-
-handle_call({split, Body, BugSpecs}, _From, #world_state{bugs=Bugs} = State) ->
+handle_call({split, Body, BugSpecs}, _From, #world_state{bugs=Bugs}=State) ->
     case die(Body, Bugs) of
         {ok, Location, Bugs0} ->
             NewBugs = lists:foldl(fun
@@ -121,12 +116,11 @@ handle_call({split, Body, BugSpecs}, _From, #world_state{bugs=Bugs} = State) ->
         {error, _} ->
             {reply, not_found, State}
     end;
-
 handle_call(Request, From, State) ->
     io:format("handle_call: ~p, ~p, ~p~n", [Request, From, State]),
     {noreply, State}.
 
-handle_cast({die, Body}, #world_state{bugs=Bugs} = State) ->
+handle_cast({die, Body}, #world_state{bugs=Bugs}=State) ->
     case die(Body, Bugs) of
         {ok, _Location, NewBugs} ->
             {noreply, State#world_state{bugs=NewBugs}};
@@ -134,19 +128,15 @@ handle_cast({die, Body}, #world_state{bugs=Bugs} = State) ->
         {error, _} ->
             {noreply, State}
     end;
-
 handle_cast({stop, Reason}, State) ->
     {stop, Reason, State};
-
 handle_cast(Request, State) ->
     io:format("handle_cast: ~p, ~p~n", [Request, State]),
     {noreply, State}.
-
 handle_info({welcome, How}, State) ->
     io:format("Welcomed: ~p~n", [How]),
     {noreply, State};
-
-handle_info({food, Location}, #world_state{grass=Grass} = State) ->
+handle_info({food, Location}, #world_state{grass=Grass}=State) ->
     % io:format(" food @ ~p~n", [Location]),
     case dict:find(Location, Grass) of
         {ok, _} ->
@@ -158,19 +148,15 @@ handle_info({food, Location}, #world_state{grass=Grass} = State) ->
             Leaf = world_viewer:grow_leaf(Location),
             {noreply, State#world_state{grass=dict:store(Location, Leaf, Grass)}}
     end;
-
-handle_info({size, Pid}, #world_state{size=Size} = State) ->
-    % io:format(" size requested from ~p~n", [ Pid ]),
+handle_info({size, Pid}, #world_state{size=Size}=State) ->
+    % io:format(" size requested from ~p~n", [Pid]),
     Pid ! {size, Size},
     {noreply, State};
-
 handle_info({ack_grow, _Location}, State) ->
     % grass_field:dump(),
     {noreply, State};
-
 handle_info(ack_dump, State) ->
     {noreply, State};
-
 handle_info(Info, State) ->
     io:format("handle_info: ~p, ~p~n", [Info, State]),
     {noreply, State}.
@@ -179,8 +165,7 @@ handle_info(Info, State) ->
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
-%% {{{ HELPER FUNCTIONS
-
+%% {{{ Helper functions
 give_birth(Species, Parameters, Location, Bugs) ->
     case apply(Species, give_birth, Parameters) of
         {ok, BugBody} ->
@@ -233,7 +218,6 @@ cut_leaves([Leaf | Rest], Grass) ->
         error ->        % this should never happen though...
             cut_leaves(Rest, Grass)
     end.
-
 %% }}}
 
 % vim:ts=4:sw=4:et

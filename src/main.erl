@@ -5,23 +5,19 @@
 
 -export([start/0]).
 
--define(WORLD_SIZE, {700, 400}).
--define(INITIAL_COVERAGE, 0.05).
--define(FOOD_FREQUENCY, 20).        % generate a piece of food every 20 msecs
--define(BUGS_TO_CREATE, 1).
-
 start() ->
     io:format("great stuff will be here :)~n"),
     random:seed(erlang:now()),
-    Size = ?WORLD_SIZE,
+    Size = application:get_env(world_size),
     world_viewer:start_link(Size),
     arthopod_sup:start_link(),      % TODO: how to do it properly?
     case world:start(Size) of
         {ok, World} ->
             io:format("World has been created (~p)~n", [World]),
             World ! {welcome, "Thank you for being there"},
-            food_generator:start(World, ?FOOD_FREQUENCY, ?INITIAL_COVERAGE),
-            populate_world(?BUGS_TO_CREATE),
+            food_generator:start(World, application:get_env(food_frequency),
+                                 application:get_env(initial_coverage)),
+            populate_world(application:get_env(bugs_to_create)),
             loop();
         Other ->
             io:format("Failed to create the world: ~p~n", [Other])

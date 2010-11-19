@@ -6,11 +6,14 @@
 
 % each dot (grass leaf) is represented with a 2x2 square
 % each bug is represented by a 6x6 square
+% TODO: find out a way to make it configurable
 -define(CELL_SIZE, 2).
 
-% colours to use
--define(BUG_COLOUR, {16#b0, 16#30, 16#60}).
--define(GRAS_COLOUR, {0, 16#64, 0}).
+-record(viewer_state, {
+    canvas,
+    bug_colour,
+    grass_colour
+}).
 
 %% server interface
 -export([start_link/1, stop/0, make_bug/1, move_bug/2, kill_bug/1, grow_leaf/1, cut_leaf/1]).
@@ -18,7 +21,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
-%% interface implementation
+%% {{{ interface implementation
 start_link(Size) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, Size, []).
 
@@ -39,6 +42,7 @@ grow_leaf(Location) ->
 
 cut_leaf(Leaf) ->
     gen_server:cast(?MODULE, {cut_leaf, Leaf}).
+%% }}}
 
 %% gen_server callbacks implementation
 init(Size) ->
@@ -46,44 +50,46 @@ init(Size) ->
     {RealWidth, RealHeight} = real_coords(Size, 2),
     Window = gs:create(window, Gs, [{width, RealWidth}, {height, RealHeight}, {title, "Arthopods World"}, {map, true}]),
     Canvas = gs:create(canvas, Window, [{x, 0}, {y, 0}, {width, RealWidth}, {height, RealHeight}]),
-    {ok, Canvas}.
+    {ok, #viewer_state{canvas=Canvas,
+                       bug_colour=appllication:get_env(bug_colour),
+                       grass_colour=appllication:get_env(grass_colour)}}.
 
-terminate(_Reason, _Canvas) ->
-    % io:format("terminate: ~p, ~p~n", [_Reason, _Canvas]),
+terminate(_Reason, _State) ->
+    % io:format("terminate: ~p, ~p~n", [_Reason, _State]),
     gs:stop().
 
-handle_call({make_bug, Location}, _From, Canvas) ->
+handle_call({make_bug, Location}, _From, #viewer_state{canvas=Canvas, bug_colour=BugColour}=State) ->
     {reply, gs:create(rectangle, Canvas, [
         {coords, bug_rect(Location)},
         {bw, 1},
-        {fg, ?BUG_COLOUR},
-        {fill, ?BUG_COLOUR}
-    ]), Canvas};
-handle_call({grow_leaf, Location}, _From, Canvas) ->
+        {fg, BugColour},
+        {fill, BugColour}
+    ]), State};
+handle_call({grow_leaf, Location}, _From, #viewer_state{canvas=Canvas, grass_colour=GrassColour}=State) ->
     {reply, gs:create(rectangle, Canvas, [
         {coords, grass_rect(Location)},
         {bw, 1},
-        {fg, ?GRAS_COLOUR},
-        {fill, ?GRAS_COLOUR}
-    ]), Canvas};
-handle_call(Request, From, Canvas) ->
-    io:format("handle_call: ~p, ~p, ~p~n", [Request, From, Canvas]),
-    {noreply, Canvas}.
+        {fg, GrassColour},
+        {fill, GrassColour}
+    ]), State};
+handle_call(Request, From, State) ->
+    io:format("handle_call: ~p, ~p, ~p~n", [Request, From, State]),
+    {noreply, State}.
 
-handle_cast({stop, Reason}, Canvas) ->
-    {stop, Reason, Canvas};
-handle_cast({move_bug, Bug, Location}, Canvas) ->
+handle_cast({stop, Reason}, State) ->
+    {stop, Reason, State};
+handle_cast({move_bug, Bug, Location}, State) ->
     gs:config(Bug, [{coords, bug_rect(Location)}]),
-    {noreply, Canvas};
-handle_cast({kill_bug, Bug}, Canvas) ->
+    {noreply, State};
+handle_cast({kill_bug, Bug}, State) ->
     gs:destroy(Bug),
-    {noreply, Canvas};
-handle_cast({cut_leaf, Leaf}, Canvas) ->
+    {noreply, State};
+handle_cast({cut_leaf, Leaf}, State) ->
     gs:destroy(Leaf),
-    {noreply, Canvas};
-handle_cast(Request, Canvas) ->
-    io:format("handle_cast: ~p, ~p~n", [Request, Canvas]),
-    {noreply, Canvas}.
+    {noreply, State};
+handle_cast(Request, State) ->
+    io:format("handle_cast: ~p, ~p~n", [Request, State]),
+    {noreply, State}.
 
 % not implemented callbacks for gen_server
 handle_info(Info, State) ->

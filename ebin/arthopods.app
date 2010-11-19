@@ -2,8 +2,7 @@
     {description, "Arthopods Simulated Evolution"},
     {vsn, "0.0"},
     {modules, [
-        arthopods_app,
-        arthopods_sup,
+        arthopods,
         arthopod,
         arthopod_simple,
         arthopod_sup,
@@ -21,7 +20,7 @@
         kernel,
         stdlib
     ]},
-    {mod, {arthopods_app, []}},
+    {mod, {arthopods, []}},
     {env, [
     ]}
 ]}.

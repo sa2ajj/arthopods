@@ -9,3 +9,6 @@ run: all
 
 run_app: all
 	erl -pa ebin/ -noshell -s arthopods_app -s init stop
+
+release:
+	./rebar generate

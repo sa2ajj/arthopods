@@ -1,3 +1,4 @@
 *.beam
 other/
 erl_crash.dump
+rel/arthopods/

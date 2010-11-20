@@ -66,6 +66,11 @@ handle_cast(Request, State) ->
     io:format("handle_cast: ~p, ~p~n", [Request, State]),
     {noreply, State}.
 
+-type point() :: {integer(), integer()}.
+-type grass_field() :: {empty, point(), point()} |
+                       {leaf, point(), point(), point()} |
+                       {patch, point(), grass_field(), grass_field(),
+                                        grass_field(), grass_field()}.
 %% grass field handling
 %
 % GrassField :=
@@ -79,9 +84,11 @@ handle_cast(Request, State) ->
 % Point := {Integer, Integer}
 %
 
+-spec empty_field(integer()) -> grass_field().
 empty_field(Size) ->
     {empty, {0, 0}, {Size, Size}}.
 
+-spec grow(grass_field(), point()) -> grass_field().
 grow({empty, Corner0, Corner1}, Location) ->
     {leaf, Location, Corner0, Corner1};
 grow({leaf, _Leaf, _Corner0, _Corner1}=GrassField, _Leaf) ->
@@ -111,6 +118,7 @@ grow({patch, {Xc, Yc}=Center, Patch1, Patch2, Patch3, Patch4}, {X, Y}=Location) 
 % Y0 +----+----+
 %    X0   Xc   X1
 
+-spec make_patch(point(), point()) -> grass_field().
 make_patch({X0, Y0}, {X1, Y1}) ->
     Xc = (X0 + X1) div 2,
     Yc = (Y0 + Y1) div 2,
@@ -124,6 +132,7 @@ make_patch({X0, Y0}, {X1, Y1}) ->
 
 %% remove an item from the grass field
 
+-spec cut(grass_field(), point()) -> grass_field().
 cut({empty, _Corner0, _Corner1}=Empty, _Location) ->
     {Empty, not_found};
 cut({leaf, _Leaf, Corner0, Corner1}, _Leaf) ->
@@ -153,6 +162,7 @@ cut({patch, {Xc, Yc}=Center, Patch1, Patch2, Patch3, Patch4}, {X, Y}=Location) -
 %% find(GrassField, Boundaries, Requestor) --> NewField
 %%   the function sends a message of format {leaf, Location} for each found leaf
 
+-spec find(grass_field(), {point(), point()}, pid()) -> grass_field().
 find({leaf, {Xl, Yl}=Leaf, _Corner0, _Corner1}=Field, {{X0, Y0}, {X1, Y1}}, Requestor)
     when (X0 =< Xl) and (Xl =< X1) and (Y0 =< Yl) and (Yl =< Y1) ->
         Requestor ! {leaf, Leaf},
